@@ -21,7 +21,7 @@ interface ItineraryCardProps {
 }
 
 export function ItineraryCard({ itinerary, onDelete }: ItineraryCardProps) {
-    const { id, tripName, destination, duration, dates, createdAt } = itinerary;
+    const { id, tripName, destination, duration, dates, createdAt, imageUrl } = itinerary;
     const city = destination.split(',')[0];
 
     const formattedCreationDate = format(parseISO(createdAt), "dd/MM/yy", { locale: es });
@@ -31,7 +31,7 @@ export function ItineraryCard({ itinerary, onDelete }: ItineraryCardProps) {
             <Link href={`/my-itineraries/${id}`} className="block">
                 <div className="relative h-40">
                     <Image
-                        src={`https://placehold.co/600x400.png`}
+                        src={imageUrl || `https://placehold.co/600x400.png`}
                         data-ai-hint={`${city} landscape`}
                         alt={`Imagen de ${city}`}
                         fill

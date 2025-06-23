@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary-form';
 import { generateItinerary } from '@/ai/flows/generate-itinerary';
+import { generateDestinationImage } from '@/ai/flows/generate-destination-image';
 import { HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
@@ -10,12 +11,14 @@ import Link from 'next/link';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Creando tu viaje perfecto...");
   const { toast } = useToast();
   const router = useRouter();
 
   const handleGenerate = async (data: any) => {
     setIsLoading(true);
     try {
+      setLoadingMessage("Creando tu viaje perfecto...");
       const formattedData = {
         ...data,
         fechaSalida: format(data.fechaSalida, 'yyyy-MM-dd'),
@@ -33,11 +36,15 @@ export default function Home() {
         return;
       }
       
+      setLoadingMessage("Generando una imagen para tu destino...");
+      const imageResult = await generateDestinationImage({ destination: result.destination });
+
       const savedItineraries = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
       const newItinerary = {
         id: `trip-${Date.now()}`,
         createdAt: new Date().toISOString(),
-        ...result
+        ...result,
+        imageUrl: imageResult.imageUrl,
       };
       savedItineraries.push(newItinerary);
       localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries));
@@ -80,7 +87,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <div className="flex justify-center items-center gap-2">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="font-body text-muted-foreground">Creando tu viaje perfecto...</p>
+              <p className="font-body text-muted-foreground">{loadingMessage}</p>
             </div>
           </div>
         )}
