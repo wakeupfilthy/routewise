@@ -18,9 +18,10 @@ import { es } from 'date-fns/locale';
 interface ItineraryCardProps {
     itinerary: SavedItinerary;
     onDelete: (id: string) => void;
+    onRenameRequest: (itinerary: SavedItinerary) => void;
 }
 
-export function ItineraryCard({ itinerary, onDelete }: ItineraryCardProps) {
+export function ItineraryCard({ itinerary, onDelete, onRenameRequest }: ItineraryCardProps) {
     const { id, tripName, destination, duration, dates, createdAt, imageUrl } = itinerary;
     const city = destination.split(',')[0];
 
@@ -52,8 +53,7 @@ export function ItineraryCard({ itinerary, onDelete }: ItineraryCardProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem disabled>Cambiar nombre</DropdownMenuItem>
-                            <DropdownMenuItem disabled>Editar</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onRenameRequest(itinerary)}>Cambiar nombre</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => onDelete(id)} className="text-destructive">
                                 Eliminar
                             </DropdownMenuItem>

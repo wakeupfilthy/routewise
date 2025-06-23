@@ -7,6 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Edit2, HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<SavedItinerary | null>(null);
@@ -14,17 +25,35 @@ export default function ItineraryDetailPage() {
     const router = useRouter();
     const id = params.id as string;
 
+    const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+    const [newTripName, setNewTripName] = useState('');
+
     useEffect(() => {
         if (id) {
             const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
             const currentItinerary = savedItineraries.find(it => it.id === id);
             if (currentItinerary) {
                 setItinerary(currentItinerary);
+                setNewTripName(currentItinerary.tripName);
             } else {
                 router.push('/my-itineraries');
             }
         }
     }, [id, router]);
+
+    const handleRenameSubmit = () => {
+        if (!itinerary || !newTripName.trim()) return;
+
+        const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+        const updatedItineraries = savedItineraries.map(it => 
+            it.id === id ? { ...it, tripName: newTripName.trim() } : it
+        );
+        localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+        
+        setItinerary(prev => prev ? { ...prev, tripName: newTripName.trim() } : null);
+        
+        setIsRenameDialogOpen(false);
+    }
 
     if (!itinerary) {
         return (
@@ -50,7 +79,7 @@ export default function ItineraryDetailPage() {
                 <div className="text-center mb-8">
                     <div className="flex justify-center items-center gap-2">
                         <h1 className="text-3xl md:text-4xl font-headline font-bold">{tripName}</h1>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)}>
                             <Edit2 className="h-5 w-5" />
                         </Button>
                     </div>
@@ -108,6 +137,37 @@ export default function ItineraryDetailPage() {
                     </div>
                 </div>
             </main>
+            
+            <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Cambiar nombre del viaje</DialogTitle>
+                        <DialogDescription>
+                            Elige un nuevo nombre para tu viaje a {itinerary?.destination}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">
+                                Nombre
+                            </Label>
+                            <Input
+                                id="name"
+                                value={newTripName}
+                                onChange={(e) => setNewTripName(e.target.value)}
+                                className="col-span-3"
+                                onKeyDown={(e) => e.key === 'Enter' && handleRenameSubmit()}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                         <DialogClose asChild>
+                           <Button variant="outline">Cancelar</Button>
+                        </DialogClose>
+                        <Button onClick={handleRenameSubmit}>Guardar cambios</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             
             <footer className="sticky bottom-0 bg-primary/20 backdrop-blur-sm border-t mt-8">
                 <div className="container mx-auto h-16 flex justify-around items-center text-gray-600">
