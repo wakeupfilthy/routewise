@@ -17,9 +17,9 @@ type ItineraryItem = GenerateItineraryOutput[0];
 
 const getIconForActivity = (activity: string) => {
   const lowerActivity = activity.toLowerCase();
-  if (lowerActivity.includes('hike') || lowerActivity.includes('nature') || lowerActivity.includes('park')) return <Mountain className="h-5 w-5 text-accent" />;
-  if (lowerActivity.includes('food') || lowerActivity.includes('eat') || lowerActivity.includes('restaurant') || lowerActivity.includes('tasting')) return <Utensils className="h-5 w-5 text-accent" />;
-  if (lowerActivity.includes('museum') || lowerActivity.includes('history') || lowerActivity.includes('art') || lowerActivity.includes('sightsee')) return <Landmark className="h-5 w-5 text-accent" />;
+  if (lowerActivity.includes('hike') || lowerActivity.includes('naturaleza') || lowerActivity.includes('parque')) return <Mountain className="h-5 w-5 text-accent" />;
+  if (lowerActivity.includes('comida') || lowerActivity.includes('restaurante') || lowerActivity.includes('degustación')) return <Utensils className="h-5 w-5 text-accent" />;
+  if (lowerActivity.includes('museo') || lowerActivity.includes('historia') || lowerActivity.includes('arte') || lowerActivity.includes('turismo')) return <Landmark className="h-5 w-5 text-accent" />;
   return <Sparkles className="h-5 w-5 text-accent" />;
 };
 
@@ -31,18 +31,18 @@ export function ItineraryDisplay({ itinerary }: { itinerary: GenerateItineraryOu
   const handleSave = () => {
     localStorage.setItem('savedItinerary', JSON.stringify(itinerary));
     toast({
-        title: "Itinerary Saved!",
-        description: "Your itinerary has been saved to this browser.",
+        title: "¡Itinerario Guardado!",
+        description: "Tu itinerario ha sido guardado en este navegador.",
     });
   }
 
   return (
     <div className="font-body max-w-4xl mx-auto">
        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">Your Personalized Itinerary</h2>
+        <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">Tu Itinerario Personalizado</h2>
         <Button onClick={handleSave} variant="outline">
             <BookMarked className="mr-2 h-4 w-4" />
-            Save Itinerary
+            Guardar Itinerario
         </Button>
       </div>
       <Accordion type="single" collapsible className="w-full space-y-4">
@@ -51,15 +51,15 @@ export function ItineraryDisplay({ itinerary }: { itinerary: GenerateItineraryOu
             <AccordionTrigger className="p-6 text-lg font-headline hover:no-underline text-left">
               <div className="flex items-center gap-4">
                 {getIconForActivity(item.activity)}
-                <span>Day {item.day}: {item.activity}</span>
+                <span>Día {item.day}: {item.activity}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="p-6 pt-0">
-              <p className="text-muted-foreground mb-4"><strong>Location:</strong> {item.location}</p>
+              <p className="text-muted-foreground mb-4"><strong>Ubicación:</strong> {item.location}</p>
               <p className="text-muted-foreground mb-4">{item.description}</p>
               <Button onClick={() => setSelectedLocation(item)}>
                 <MapPin className="mr-2 h-4 w-4" />
-                View Location Details
+                Ver Detalles del Lugar
               </Button>
             </AccordionContent>
           </AccordionItem>
