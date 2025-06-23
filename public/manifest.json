@@ -1,21 +1,21 @@
 {
-  "name": "Tripmate",
-  "short_name": "Tripmate",
-  "description": "Tu compañero de viaje con IA.",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#E0D1F9",
-  "theme_color": "#E0D1F9",
-  "icons": [
-    {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "Tripmate",
+    "short_name": "Tripmate",
+    "description": "Tu compañero de viaje con IA.",
+    "start_url": "/",
+    "display": "fullscreen",
+    "background_color": "hsl(255 70% 88%)",
+    "theme_color": "hsl(255 70% 88%)",
+    "icons": [
+      {
+        "src": "/icon-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/icon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
 }
