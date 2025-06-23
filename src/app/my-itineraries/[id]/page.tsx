@@ -71,7 +71,7 @@ export default function ItineraryDetailPage() {
                 <div className="max-w-2xl mx-auto">
                     <Card className="mb-8 bg-primary/10 border-primary/30 shadow-lg">
                         <CardHeader>
-                            <CardTitle className="text-center text-2xl font-headline font-semibold">Resumen</CardTitle>
+                            <CardTitle className="text-center text-2xl font-headline font-semibold">Resumen de Costos</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
@@ -87,6 +87,9 @@ export default function ItineraryDetailPage() {
                                 <span>TOTAL:</span>
                                 <span>{summary.total}</span>
                             </div>
+                            <p className="text-xs text-muted-foreground text-center mt-4">
+                                Los precios son referenciales y pueden variar.
+                            </p>
                         </CardContent>
                     </Card>
 
