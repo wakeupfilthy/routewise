@@ -42,7 +42,7 @@ export default function Home() {
       savedItineraries.push(newItinerary);
       localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries));
 
-      router.push(`/my-itineraries/${newItinerary.id}`);
+      router.push(`/my-itineraries`);
 
     } catch (e) {
       toast({
