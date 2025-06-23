@@ -23,6 +23,7 @@ export default function Home() {
         ...data,
         fechaSalida: format(data.fechaSalida, 'yyyy-MM-dd'),
         preferencias: data.preferencias.join(', '),
+        userLocale: navigator.language,
       };
       const result = await generateItinerary(formattedData);
       

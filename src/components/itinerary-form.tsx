@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -68,16 +68,22 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
       origen: '',
       duracion: '5',
       fechaSalida: undefined,
-      presupuesto: 'Medio 1000 - 2500',
+      presupuesto: 'Medio',
       acompanantes: 'Solo',
       preferencias: ['naturaleza'],
       otrasActividades: '',
     },
   });
 
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
-    form.setValue('fechaSalida', new Date());
-  }, [form.setValue]);
+      setIsClient(true);
+      if (!form.getValues('fechaSalida')) {
+          form.setValue('fechaSalida', new Date());
+      }
+  }, [form.setValue, form]);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     onGenerate(values);
@@ -146,7 +152,7 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                                 !field.value && "text-muted-foreground"
                             )}
                             >
-                            {field.value ? (
+                            {field.value && isClient ? (
                                 format(field.value, "dd/MM/yy")
                             ) : (
                                 <span>DD/MM/YY</span>
@@ -186,9 +192,9 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Bajo 0-1000 USD">Bajo 0-1000 USD</SelectItem>
-                        <SelectItem value="Medio 1000 - 2500">Medio 1000 - 2500</SelectItem>
-                        <SelectItem value="Alto +2500">Alto +2500</SelectItem>
+                        <SelectItem value="Bajo">Bajo</SelectItem>
+                        <SelectItem value="Medio">Medio</SelectItem>
+                        <SelectItem value="Alto">Alto</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
