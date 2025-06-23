@@ -52,9 +52,18 @@ export default function Home() {
       router.push(`/my-itineraries`);
 
     } catch (e) {
+      let errorMessage = "No pudimos generar tu itinerario. Por favor, inténtalo de nuevo más tarde.";
+      if (e instanceof Error && e.message) {
+        if (e.message.includes('SAFETY')) {
+            errorMessage = 'Tu solicitud fue bloqueada por filtros de seguridad. Intenta con una descripción menos específica o diferente.';
+        } else if (e.message.includes('quota')) {
+            errorMessage = 'Se ha alcanzado el límite de solicitudes. Por favor, inténtalo más tarde.';
+        }
+      }
+
       toast({
         title: "Ocurrió un error",
-        description: "No pudimos generar tu itinerario. Por favor, inténtalo de nuevo más tarde.",
+        description: errorMessage,
         variant: "destructive"
       });
       console.error(e);
@@ -67,7 +76,7 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-headline font-bold">
-            TripMate
+            Tripmate
           </h1>
           <div className='mt-2 text-muted-foreground'>
             <p className="text-md">
