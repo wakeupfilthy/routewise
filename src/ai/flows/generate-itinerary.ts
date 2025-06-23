@@ -22,7 +22,6 @@ const GenerateItineraryInputSchema = z.object({
   acompanantes: z.string().describe('Con quién viaja el usuario (e.g., Solo, En Pareja, etc.).'),
   preferencias: z.string().describe('Una lista de preferencias de viaje separada por comas (e.g., culturales, naturaleza, gastronomía).'),
   otrasActividades: z.string().optional().describe('Otras actividades de interés para el usuario.'),
-  userLocale: z.string().optional().describe("La configuración regional del usuario (por ejemplo, 'es-MX' o 'en-US') para determinar la moneda local."),
 });
 
 export type GenerateItineraryInput = z.infer<typeof GenerateItineraryInputSchema>;
@@ -76,12 +75,11 @@ const prompt = ai.definePrompt({
   - Acompañantes: {{{acompanantes}}}
   - Preferencias de viaje: {{{preferencias}}}
   - Otras actividades de interés: {{{otrasActividades}}}
-  {{#if userLocale}}- Configuración Regional: {{{userLocale}}}{{/if}}
   
   **Tareas:**
   1.  **Crear un nombre para el viaje:** Basado en el destino, como "Mi Viaje a {{{destino}}}".
   2.  **Confirmar detalles:** Incluye el destino (ciudad, país), la duración en días, y el rango de fechas del viaje calculado a partir de la fecha de salida y la duración.
-  3.  **Generar un resumen de costos:** Proporciona un rango de precios estimado{{#if userLocale}} en la moneda local del usuario (basado en la configuración regional '{{{userLocale}}}'){{else}} en USD{{/if}} para: vuelos, alojamiento, transporte local, alimentación, actividades y entradas, extras y contingencia, y un total. Sé realista con los costos basándote en el destino y el presupuesto indicado. Incluye el código de la moneda (e.g., USD, EUR, MXN) en cada valor.
+  3.  **Generar un resumen de costos:** Proporciona un rango de precios estimado en USD para: vuelos, alojamiento, transporte local, alimentación, actividades y entradas, extras y contingencia, y un total. Sé realista con los costos basándote en el destino y el presupuesto indicado. Incluye el código de la moneda "USD" en cada valor.
   4.  **Crear un itinerario diario:** Para cada día del viaje, define un título, un horario (ej. "Mañana (9:00 AM - 1:00 PM)"), y una descripción de la actividad. Las actividades deben ser coherentes con las preferencias del usuario. Ten en cuenta eventos de temporada o locales.
   
   Genera la respuesta completa en el formato JSON especificado.
