@@ -82,7 +82,7 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
       if (!form.getValues('fechaSalida')) {
           form.setValue('fechaSalida', new Date());
       }
-  }, [form.setValue, form]);
+  }, [form]);
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -192,9 +192,9 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Bajo">Bajo</SelectItem>
-                        <SelectItem value="Medio">Medio</SelectItem>
-                        <SelectItem value="Alto">Alto</SelectItem>
+                        <SelectItem value="Bajo">Bajo (ej. &lt;1000 USD)</SelectItem>
+                        <SelectItem value="Medio">Medio (ej. 1000-3000 USD)</SelectItem>
+                        <SelectItem value="Alto">Alto (ej. &gt;3000 USD)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
