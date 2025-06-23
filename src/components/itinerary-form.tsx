@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -66,13 +67,17 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
       destino: '',
       origen: '',
       duracion: '5',
-      fechaSalida: new Date(),
+      fechaSalida: undefined,
       presupuesto: 'Medio 1000 - 2500',
       acompanantes: 'Solo',
       preferencias: ['naturaleza'],
       otrasActividades: '',
     },
   });
+
+  useEffect(() => {
+    form.setValue('fechaSalida', new Date());
+  }, [form.setValue]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     onGenerate(values);
