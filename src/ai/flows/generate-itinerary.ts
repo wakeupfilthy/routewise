@@ -25,14 +25,31 @@ const GenerateItineraryInputSchema = z.object({
 
 export type GenerateItineraryInput = z.infer<typeof GenerateItineraryInputSchema>;
 
-const ItineraryItemSchema = z.object({
-  day: z.number().describe('El número del día en el itinerario.'),
-  location: z.string().describe('La ubicación para el día.'),
-  activity: z.string().describe('La actividad para el día.'),
-  description: z.string().describe('Una descripción detallada de la ubicación y la actividad.'),
-});
-
-const GenerateItineraryOutputSchema = z.array(ItineraryItemSchema).describe('Una lista clasificada de sugerencias de itinerarios basada en la alineación con las preferencias del usuario.');
+const CostSummarySchema = z.object({
+    vuelos: z.string().describe('Rango de costo estimado para vuelos (e.g., "$1,500 - $2,200 USD").'),
+    alojamiento: z.string().describe('Rango de costo estimado para alojamiento.'),
+    transporteLocal: z.string().describe('Rango de costo estimado para transporte local.'),
+    alimentacion: z.string().describe('Rango de costo estimado para alimentación.'),
+    actividades: z.string().describe('Rango de costo estimado para actividades y entradas.'),
+    extras: z.string().describe('Rango de costo estimado para extras y contingencias.'),
+    total: z.string().describe('Rango de costo total estimado.'),
+  });
+  
+  const ItineraryItemSchema = z.object({
+    day: z.number().describe('El número del día en el itinerario.'),
+    title: z.string().describe('Un título para las actividades del día (e.g., "Viaje en el Tiempo al Coliseo y Foro Romano").'),
+    time: z.string().describe('El horario para la actividad (e.g., "Mañana (9:00 AM - 1:00 PM)").'),
+    description: z.string().describe('Una descripción detallada de la ubicación y la actividad.'),
+  });
+  
+  const GenerateItineraryOutputSchema = z.object({
+    tripName: z.string().describe('Un nombre para el viaje, como "Mi Viaje a París". El nombre debe ser corto y atractivo.'),
+    destination: z.string().describe('El destino del viaje (ciudad y país, e.g., "París, Francia").'),
+    duration: z.string().describe('La duración del viaje en días (e.g., "8 días").'),
+    dates: z.string().describe('El rango de fechas del viaje (e.g., "17/11/2026 - 25/11/2026").'),
+    summary: CostSummarySchema.describe('Un resumen de los costos estimados del viaje.'),
+    itinerary: z.array(ItineraryItemSchema).describe('Una lista de sugerencias de itinerarios diarios.'),
+  });
 
 export type GenerateItineraryOutput = z.infer<typeof GenerateItineraryOutputSchema>;
 
@@ -41,25 +58,32 @@ export async function generateItinerary(input: GenerateItineraryInput): Promise<
 }
 
 const prompt = ai.definePrompt({
-  name: 'generateItineraryPrompt',
-  input: {schema: GenerateItineraryInputSchema},
-  output: {schema: GenerateItineraryOutputSchema},
-  prompt: `Eres un experto agente de viajes especializado en crear itinerarios personalizados en español.
-
-Utilizarás la siguiente información para generar un itinerario detallado para el usuario, incluyendo lugares, actividades y descripciones. Ten en cuenta los eventos de temporada para crear la ruta óptima y devuelve un itinerario clasificado según la mejor alineación con las preferencias del usuario.
-
-Destino: {{{destino}}}
-Origen: {{{origen}}}
-Duración: {{{duracion}}} días
-Fecha de salida: {{{fechaSalida}}}
-Presupuesto: {{{presupuesto}}}
-Acompañantes: {{{acompanantes}}}
-Preferencias de viaje: {{{preferencias}}}
-Otras actividades de interés: {{{otrasActividades}}}
-
-Itinerario:
-`,
-});
+    name: 'generateItineraryPrompt',
+    input: {schema: GenerateItineraryInputSchema},
+    output: {schema: GenerateItineraryOutputSchema},
+    prompt: `Eres un experto agente de viajes especializado en crear itinerarios personalizados en español.
+  
+  Utilizarás la siguiente información para generar un itinerario detallado para el usuario. La respuesta DEBE estar en formato JSON y cumplir con el esquema proporcionado.
+  
+  **Información del Viaje:**
+  - Destino: {{{destino}}}
+  - Origen: {{{origen}}}
+  - Duración: {{{duracion}}} días
+  - Fecha de salida: {{{fechaSalida}}}
+  - Presupuesto: {{{presupuesto}}}
+  - Acompañantes: {{{acompanantes}}}
+  - Preferencias de viaje: {{{preferencias}}}
+  - Otras actividades de interés: {{{otrasActividades}}}
+  
+  **Tareas:**
+  1.  **Crear un nombre para el viaje:** Basado en el destino, como "Mi Viaje a {{{destino}}}".
+  2.  **Confirmar detalles:** Incluye el destino (ciudad, país), la duración en días, y el rango de fechas del viaje calculado a partir de la fecha de salida y la duración.
+  3.  **Generar un resumen de costos:** Proporciona un rango de precios estimado en USD para: vuelos, alojamiento, transporte local, alimentación, actividades y entradas, extras y contingencia, y un total. Sé realista con los costos basándote en el destino y el presupuesto indicado.
+  4.  **Crear un itinerario diario:** Para cada día del viaje, define un título, un horario (ej. "Mañana (9:00 AM - 1:00 PM)"), y una descripción de la actividad. Las actividades deben ser coherentes con las preferencias del usuario. Ten en cuenta eventos de temporada o locales.
+  
+  Genera la respuesta completa en el formato JSON especificado.
+  `,
+  });
 
 const generateItineraryFlow = ai.defineFlow(
   {
