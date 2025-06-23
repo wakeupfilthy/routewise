@@ -5,6 +5,20 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: 'Tripmate',
   description: 'Tu compañero de viaje con IA.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Tripmate',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: '/icon-192x192.png',
+    shortcut: '/icon-192x192.png',
+    apple: '/icon-192x192.png',
+  },
 };
 
 export default function RootLayout({
