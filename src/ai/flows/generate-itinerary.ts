@@ -28,13 +28,13 @@ const GenerateItineraryInputSchema = z.object({
 export type GenerateItineraryInput = z.infer<typeof GenerateItineraryInputSchema>;
 
 const CostSummarySchema = z.object({
-    vuelos: z.string().describe('Rango de costo estimado para vuelos.'),
-    alojamiento: z.string().describe('Rango de costo estimado para alojamiento.'),
-    transporteLocal: z.string().describe('Rango de costo estimado para transporte local.'),
-    alimentacion: z.string().describe('Rango de costo estimado para alimentación.'),
-    actividades: z.string().describe('Rango de costo estimado para actividades y entradas.'),
-    extras: z.string().describe('Rango de costo estimado para extras y contingencias.'),
-    total: z.string().describe('Rango de costo total estimado.'),
+    vuelos: z.string().describe('Rango de costo estimado para vuelos (e.g., "500-700 USD").'),
+    alojamiento: z.string().describe('Rango de costo estimado para alojamiento (e.g., "1000-1500 USD").'),
+    transporteLocal: z.string().describe('Rango de costo estimado para transporte local (e.g., "150-250 USD").'),
+    alimentacion: z.string().describe('Rango de costo estimado para alimentación (e.g., "400-600 USD").'),
+    actividades: z.string().describe('Rango de costo estimado para actividades y entradas (e.g., "200-300 USD").'),
+    extras: z.string().describe('Rango de costo estimado para extras y contingencias (e.g., "100-200 USD").'),
+    total: z.string().describe('Rango de costo total estimado (e.g., "2350-3550 USD").'),
   });
   
   const ItineraryItemSchema = z.object({

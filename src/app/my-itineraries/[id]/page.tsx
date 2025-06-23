@@ -36,15 +36,6 @@ export default function ItineraryDetailPage() {
 
     const { tripName, destination, duration, dates, summary, itinerary: dailyPlan } = itinerary;
 
-    const summaryItems = [
-      { label: 'Vuelos', value: summary.vuelos },
-      { label: 'Alojamiento', value: summary.alojamiento },
-      { label: 'Transporte Local', value: summary.transporteLocal },
-      { label: 'Alimentación', value: summary.alimentacion },
-      { label: 'Actividades y Entradas', value: summary.actividades },
-      { label: 'Extras y Contingencia', value: summary.extras },
-    ];
-
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <header className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 border-b">
@@ -69,29 +60,38 @@ export default function ItineraryDetailPage() {
                 </div>
                 
                 <div className="max-w-2xl mx-auto">
-                    <Card className="mb-8 bg-primary/10 border-primary/30 shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="text-center text-2xl font-headline font-semibold">Resumen de Costos</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                {summaryItems.map(item => (
-                                    <div key={item.label} className="flex justify-between items-center text-sm font-body">
-                                        <span className="text-muted-foreground">{item.label}</span>
-                                        <span className="font-semibold">{item.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="border-t border-primary/30 my-4"></div>
-                            <div className="flex justify-between items-center font-bold text-lg font-body">
-                                <span>TOTAL:</span>
-                                <span>{summary.total}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground text-center mt-4">
-                                Los precios son referenciales y pueden variar.
-                            </p>
-                        </CardContent>
-                    </Card>
+                    {summary && (
+                        <Card className="mb-8 bg-primary/10 border-primary/30 shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="text-center text-2xl font-headline font-semibold">Resumen de Costos</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {[
+                                        { label: 'Vuelos', value: summary.vuelos },
+                                        { label: 'Alojamiento', value: summary.alojamiento },
+                                        { label: 'Transporte Local', value: summary.transporteLocal },
+                                        { label: 'Alimentación', value: summary.alimentacion },
+                                        { label: 'Actividades y Entradas', value: summary.actividades },
+                                        { label: 'Extras y Contingencia', value: summary.extras },
+                                    ].map(item => (
+                                        <div key={item.label} className="flex justify-between items-center text-sm font-body">
+                                            <span className="text-muted-foreground">{item.label}</span>
+                                            <span className="font-semibold">{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="border-t border-primary/30 my-4"></div>
+                                <div className="flex justify-between items-center font-bold text-lg font-body">
+                                    <span>TOTAL:</span>
+                                    <span>{summary.total}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground text-center mt-4">
+                                    Los precios son referenciales y pueden variar.
+                                </p>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <div className="space-y-6">
                         {dailyPlan.map((day, index) => (
