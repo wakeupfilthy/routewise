@@ -67,7 +67,7 @@ export default function Home() {
       <main className="flex-grow container mx-auto px-4 py-8">
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-headline font-bold">
-            PLANIFICA TU VIAJE
+            TripMate
           </h1>
           <div className='mt-2 text-muted-foreground'>
             <p className="text-md">

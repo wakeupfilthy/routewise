@@ -37,7 +37,7 @@ export default function MyItinerariesPage() {
         <div className="min-h-screen bg-background text-foreground flex flex-col pb-20">
             <main className="flex-grow container mx-auto px-4 py-8">
                 <header className="text-center mb-8">
-                    <h1 className="text-4xl md:text-5xl font-headline font-bold">MI ITINERARIO</h1>
+                    <h1 className="text-4xl md:text-5xl font-headline font-bold">MIS ITINERARIOS</h1>
                     <div className='mt-2 text-muted-foreground'>
                         <p className="text-md">Descubre tu siguiente destino</p>
                         <p className="text-md">Aquí encontrarás los detalles del viaje de tus sueños para que vivas la mejor experiencia</p>

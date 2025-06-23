@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Planifica tu Viaje',
-  description: 'Tu planificador de viajes personal con IA.',
+  title: 'Tripmate',
+  description: 'Tu compañero de viaje con IA.',
 };
 
 export default function RootLayout({
