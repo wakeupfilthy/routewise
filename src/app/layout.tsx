@@ -1,6 +1,14 @@
 import type {Metadata} from 'next';
+import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { cn } from '@/lib/utils';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-body',
+  weight: ['400', '700']
+});
 
 export const metadata: Metadata = {
   title: 'Tripmate',
@@ -28,12 +36,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
+      <head />
+      <body className={cn("font-body antialiased", montserrat.variable)}>
         {children}
         <Toaster />
       </body>
