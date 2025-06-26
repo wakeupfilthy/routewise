@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary-form';
 import { generateItinerary } from '@/ai/flows/generate-itinerary';
-import { generateDestinationImage } from '@/ai/flows/generate-destination-image';
 import { HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
@@ -36,18 +35,28 @@ export default function Home() {
         return;
       }
       
-      setLoadingMessage("Generando una imagen para tu destino...");
-      const imageResult = await generateDestinationImage({ destination: result.destination });
-
       const savedItineraries = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
       const newItinerary = {
         id: `trip-${Date.now()}`,
         createdAt: new Date().toISOString(),
         ...result,
-        imageUrl: imageResult.imageUrl,
       };
       savedItineraries.push(newItinerary);
-      localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries));
+      
+      try {
+        localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries));
+      } catch (e) {
+        if (e instanceof Error && e.name === 'QuotaExceededError') {
+            toast({
+              title: "Error al guardar",
+              description: "No hay suficiente espacio para guardar más viajes. Por favor, elimina algunos itinerarios antiguos.",
+              variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
+        }
+        throw e;
+      }
 
       router.push(`/my-itineraries`);
 
