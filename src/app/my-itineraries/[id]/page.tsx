@@ -4,16 +4,17 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { SavedItinerary } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Edit2, HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter,
+    DialogFooter as DialogFooterComponent,
     DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
@@ -63,11 +64,12 @@ export default function ItineraryDetailPage() {
         );
     }
 
-    const { tripName, destination, duration, dates, resumen, gastos, itinerary: dailyPlan } = itinerary;
+    const { tripName, destination, duration, dates, resumen, gastos, itinerary: dailyPlan, imageUrl } = itinerary;
+    const city = destination.split(',')[0];
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
-            <header className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 border-b">
+            <header className="sticky top-0 bg-background/80 backdrop-blur-sm z-20 border-b">
                 <div className="container mx-auto px-4 h-16 flex items-center">
                     <Button variant="ghost" size="icon" onClick={() => router.push('/my-itineraries')}>
                         <ArrowLeft className="h-6 w-6" />
@@ -75,17 +77,29 @@ export default function ItineraryDetailPage() {
                 </div>
             </header>
 
-            <main className="flex-grow container mx-auto px-4 py-8">
-                <div className="text-center mb-8">
-                    <div className="flex justify-center items-center gap-2">
-                        <h1 className="text-3xl md:text-4xl font-headline font-bold">{tripName}</h1>
-                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)}>
+            <main className="flex-grow container mx-auto px-4 pb-8">
+                <div className="relative h-56 md:h-72 rounded-lg overflow-hidden -mx-4 md:mx-0 mb-8 shadow-lg">
+                    <Image
+                        src={imageUrl || `https://placehold.co/600x400.png`}
+                        alt={`Imagen de ${city}`}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={`${city} landscape`}
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                </div>
+
+                <div className="text-center mb-8 -mt-24 md:-mt-28 relative z-10">
+                     <div className="flex justify-center items-center gap-2 text-white">
+                        <h1 className="text-3xl md:text-4xl font-headline font-bold drop-shadow-lg">{tripName}</h1>
+                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-white/20 hover:text-white">
                             <Edit2 className="h-5 w-5" />
                         </Button>
                     </div>
-                    <p className="text-muted-foreground mt-1">Destino a {destination}</p>
-                    <p className="text-muted-foreground">{duration}</p>
-                    <p className="text-muted-foreground">{dates}</p>
+                    <p className="text-white/90 drop-shadow-md mt-1">{destination}</p>
+                    <p className="text-white/90 drop-shadow-md">{duration}</p>
+                    <p className="text-white/90 drop-shadow-md">{dates}</p>
                 </div>
                 
                 <div className="max-w-3xl mx-auto">
@@ -105,7 +119,7 @@ export default function ItineraryDetailPage() {
                             <CardHeader>
                                 <CardTitle className="text-center text-2xl font-headline font-semibold">Gastos Estimados (USD)</CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="px-6 pt-0 pb-2">
                                 <div className="space-y-2">
                                     {[
                                         { label: 'Transporte (p.p.)', value: gastos.transporte },
@@ -121,10 +135,19 @@ export default function ItineraryDetailPage() {
                                         )
                                     ))}
                                 </div>
-                                <p className="text-xs text-muted-foreground text-center mt-4">
-                                    Los precios son referenciales y pueden variar.
-                                </p>
                             </CardContent>
+                            {gastos.total && (
+                                <CardFooter className="flex-col items-start px-6 pb-4 pt-0">
+                                    <div className="w-full h-px bg-primary/30 my-2"></div>
+                                    <div className="flex justify-between items-center w-full">
+                                        <span className="text-lg font-bold">Total Estimado</span>
+                                        <span className="text-lg font-bold">{gastos.total}</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground text-center w-full mt-2">
+                                        Los precios son referenciales y pueden variar.
+                                    </p>
+                                </CardFooter>
+                            )}
                         </Card>
                     )}
 
@@ -196,12 +219,12 @@ export default function ItineraryDetailPage() {
                             />
                         </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooterComponent>
                          <DialogClose asChild>
                            <Button variant="outline">Cancelar</Button>
                         </DialogClose>
                         <Button onClick={handleRenameSubmit}>Guardar cambios</Button>
-                    </DialogFooter>
+                    </DialogFooterComponent>
                 </DialogContent>
             </Dialog>
             

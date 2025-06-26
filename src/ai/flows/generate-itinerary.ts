@@ -35,7 +35,8 @@ const GenerateItineraryOutputSchema = z.object({
       transporte: z.string().describe("Costo aproximado del transporte de ida y vuelta por persona, en USD."),
       alojamiento: z.string().describe("Costo aproximado del alojamiento para toda la estancia, en USD."),
       comidaDiaria: z.string().describe("Costo aproximado de la comida por día por persona, en USD."),
-      actividades: z.string().describe("Costo aproximado de las actividades para todo el viaje, en USD.")
+      actividades: z.string().describe("Costo aproximado de las actividades para todo el viaje, en USD."),
+      total: z.string().describe("La suma total de todos los gastos estimados para el viaje, en USD.")
   }).describe("Un resumen de los gastos estimados del viaje en USD."),
   itinerario: z.array(z.object({
       day: z.number().describe("El número del día en el itinerario."),
@@ -59,40 +60,37 @@ const prompt = ai.definePrompt({
     input: {schema: GenerateItineraryInputSchema},
     output: {schema: GenerateItineraryOutputSchema},
     model: 'googleai/gemini-2.5-flash-lite-preview-06-17',
-    prompt: `Quiero que actúes como un planificador de viajes experto y construyas itinerarios personalizados en español. La respuesta DEBE estar en formato JSON y cumplir con el esquema proporcionado.
+    prompt: `Actúa como un planificador de viajes experto. Genera un itinerario personalizado en español, siguiendo estrictamente el formato JSON y el esquema de salida proporcionado.
 
-**Tareas Generales:**
-1.  **Crear un nombre para el viaje:** Basado en el destino, como "Mi Viaje a {{{destino}}}".
-2.  **Confirmar detalles:** Incluye el destino (ciudad, país), la duración en días, y el rango de fechas del viaje calculado a partir de la fecha de salida y la duración.
-3.  **Generar Resumen:** En el campo \`resumen\`, describe brevemente qué tipo de experiencia vivirá el viajero.
-4.  **Estimar Gastos:** En el campo \`gastos\`, muestra un gasto aproximado en USD para:
-    *   \`transporte\`: Transporte de ida y vuelta (aproximado, por persona).
-    *   \`alojamiento\`: Alojamiento para la estadía completa.
-    *   \`comidaDiaria\`: Comida diaria (calculada por persona).
-    *   \`actividades\`: Costo total de actividades.
-5.  **Desglosar Itinerario:** En el campo \`itinerario\`, desglosa un plan día por día, incluyendo:
-    *   \`title\`: Un título para el día.
-    *   \`schedule\`: Horarios aproximados (mañana / tarde / noche).
-    *   \`activities\`: Actividades principales para cada día.
-    *   \`foodSuggestions\`: Lugares sugeridos para comer o cenar.
-    *   \`companionRecommendations\`: Recomendaciones relacionadas con el tipo de acompañamiento.
-    *   \`events\`: (Opcional) Eventos o festividades que ocurren durante la fecha del viaje. Si no hay, omite este campo.
-
-Adapta todo el plan al presupuesto y al estilo de viaje que mejor encaje para la persona. Haz el texto claro, realista y útil. No repitas información innecesaria.
+**Instrucciones Generales:**
+1.  **Formato JSON:** Tu respuesta DEBE ser un único objeto JSON válido que se ajuste al esquema de salida.
+2.  **Idioma:** Toda la respuesta debe estar en español.
+3.  **Realismo:** Adapta todas las sugerencias al presupuesto, preferencias y tipo de acompañantes indicados. Sé claro, realista y útil.
+4.  **Detalles del Viaje:**
+    - \`tripName\`: Crea un nombre corto y atractivo para el viaje.
+    - \`destination\`, \`duration\`, \`dates\`: Confirma estos detalles basándote en la entrada. Las fechas deben calcularse a partir de la fecha de salida y la duración.
+5.  **Resumen:** En el campo \`resumen\`, describe en un párrafo breve la experiencia general que vivirá el viajero.
+6.  **Gastos Estimados (en USD):**
+    - Calcula los costos aproximados para \`transporte\`, \`alojamiento\`, \`comidaDiaria\`, y \`actividades\`.
+    - Calcula y proporciona el costo \`total\` estimado para todo el viaje.
+7.  **Itinerario Detallado:**
+    - En el campo \`itinerario\`, crea un array donde cada objeto representa un día del viaje.
+    - Para cada día, detalla las \`activities\`, \`foodSuggestions\`, y \`companionRecommendations\`.
+    - Si hay eventos especiales (\`events\`) durante las fechas del viaje, inclúyelos. Si no, omite el campo \`events\`.
 
 ---
 
-Genera un itinerario con las siguientes características:
-- Destino: {{{destino}}}
-- Origen: {{{origen}}}
-- Duración: {{{duracion}}} días
-- Fecha de salida: {{{fechaSalida}}}
-- Acompañantes: {{{acompanantes}}}
-- Presupuesto: {{{presupuesto}}} (por persona)
-- Preferencias de viaje: {{{preferencias}}}
-- Otras actividades de interés: {{{otrasActividades}}}
+**Datos del Viaje para Generar el Itinerario:**
+- **Destino:** {{{destino}}}
+- **Origen:** {{{origen}}}
+- **Duración:** {{{duracion}}} días
+- **Fecha de salida:** {{{fechaSalida}}}
+- **Acompañantes:** {{{acompanantes}}}
+- **Presupuesto:** {{{presupuesto}}} (por persona)
+- **Preferencias:** {{{preferencias}}}
+- **Otras actividades de interés:** {{{otrasActividades}}}
 
-No olvides el formato JSON especificado en las instrucciones. Si no hay eventos o festividades no las menciones.
+Genera la respuesta en formato JSON. No incluyas texto o explicaciones fuera del objeto JSON.
 `,
   });
 
