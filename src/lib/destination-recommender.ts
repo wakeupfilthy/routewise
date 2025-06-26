@@ -29,41 +29,41 @@ export const acompanantes = ["Solo", "En Pareja", "En Familia", "Con Amigos"];
 const destinos = [
     { destino: 'Holbox, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 120, ideal_para: 'En Pareja' },
     { destino: 'Tulum, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'culturales', 'spa' ], costo_estimado: 200, ideal_para: 'Con Amigos' },
-    { destino: 'Kioto, Japón', tipo_viaje: [ 'culturales', 'gastronomia', 'naturaleza', 'festivales' ], costo_estimado: 260, ideal_para: 'En Pareja' },
-    { destino: 'Oaxaca de Juárez, México', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 100, ideal_para: 'Solo' },
-    { destino: 'Bangkok, Tailandia', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 140, ideal_para: 'Con Amigos' },
-    { destino: 'Buenos Aires, Argentina', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 140, ideal_para: 'En Pareja' },
+    { destino: 'Kioto, Japón', tipo_viaje: [ 'culturales', 'gastronomia', 'naturaleza', 'festivales' ], costo_estimado: 300, ideal_para: 'En Pareja' },
+    { destino: 'Oaxaca de Juárez, México', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 80, ideal_para: 'Solo' },
+    { destino: 'Bangkok, Tailandia', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 220, ideal_para: 'Con Amigos' },
+    { destino: 'Buenos Aires, Argentina', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 180, ideal_para: 'En Pareja' },
     { destino: 'Riviera Maya, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 250, ideal_para: 'En Familia' },
     { destino: 'Roma, Italia', tipo_viaje: [ 'culturales', 'gastronomia', 'compras' ], costo_estimado: 280, ideal_para: 'En Pareja' },
     { destino: 'Ciudad de México, México', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna', 'festivales' ], costo_estimado: 110, ideal_para: 'Solo' },
     { destino: 'San Miguel de Allende, México', tipo_viaje: [ 'culturales', 'gastronomia', 'spa' ], costo_estimado: 60, ideal_para: 'En Pareja' },
     { destino: 'Puerto Escondido, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'naturaleza' ], costo_estimado: 125, ideal_para: 'Con Amigos' },
-    { destino: 'Medellín, Colombia', tipo_viaje: [ 'culturales', 'vidaNocturna', 'naturaleza' ], costo_estimado: 75, ideal_para: 'Con Amigos' },
-    { destino: 'Lisboa, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 200, ideal_para: 'En Pareja' },
-    { destino: 'Praga, República Checa', tipo_viaje: [ 'culturales', 'vidaNocturna', 'compras' ], costo_estimado: 210, ideal_para: 'Con Amigos' },
-    { destino: 'Chiang Mai, Tailandia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia', 'spa' ], costo_estimado: 115, ideal_para: 'Solo' },
-    { destino: 'Cusco, Perú', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 120, ideal_para: 'Solo' },
-    { destino: 'Mazatlán, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'gastronomia', 'festivales' ], costo_estimado: 150, ideal_para: 'En Familia' },
+    { destino: 'Medellín, Colombia', tipo_viaje: [ 'culturales', 'vidaNocturna', 'naturaleza' ], costo_estimado: 140, ideal_para: 'Con Amigos' },
+    { destino: 'Lisboa, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 230, ideal_para: 'En Pareja' },
+    { destino: 'Praga, República Checa', tipo_viaje: [ 'culturales', 'vidaNocturna', 'compras' ], costo_estimado: 270, ideal_para: 'Con Amigos' },
+    { destino: 'Chiang Mai, Tailandia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia', 'spa' ], costo_estimado: 215, ideal_para: 'Solo' },
+    { destino: 'Cusco, Perú', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 180, ideal_para: 'Solo' },
+    { destino: 'Mazatlán, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'gastronomia', 'festivales' ], costo_estimado: 130, ideal_para: 'En Familia' },
     { destino: 'Palenque, México', tipo_viaje: [ 'culturales', 'naturaleza' ], costo_estimado: 90, ideal_para: 'Solo' },
-    { destino: 'Viena, Austria', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 205, ideal_para: 'En Pareja' },
+    { destino: 'Viena, Austria', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 235, ideal_para: 'En Pareja' },
     { destino: 'Ciudad del Cabo, Sudáfrica', tipo_viaje: [ 'naturaleza', 'culturales', 'gastronomia', 'playas' ], costo_estimado: 200, ideal_para: 'En Pareja' },
-    { destino: 'Río de Janeiro, Brasil', tipo_viaje: [ 'playas', 'vidaNocturna', 'naturaleza', 'festivales' ], costo_estimado: 158, ideal_para: 'Con Amigos' },
+    { destino: 'Río de Janeiro, Brasil', tipo_viaje: [ 'playas', 'vidaNocturna', 'naturaleza', 'festivales' ], costo_estimado: 178, ideal_para: 'Con Amigos' },
     { destino: 'Dublín, Irlanda', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 220, ideal_para: 'Con Amigos' },
     { destino: 'Mérida, México', tipo_viaje: [ 'culturales', 'gastronomia', 'naturaleza' ], costo_estimado: 100, ideal_para: 'En Familia' },
-    { destino: 'Marrakech, Marruecos', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 95, ideal_para: 'Solo' },
+    { destino: 'Marrakech, Marruecos', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 250, ideal_para: 'Solo' },
     { destino: 'Bacalar, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 75, ideal_para: 'En Pareja' },
     { destino: 'Guadalajara, México', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna', 'festivales' ], costo_estimado: 85, ideal_para: 'Con Amigos' },
     { destino: 'Puebla, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 60, ideal_para: 'En Familia' },
     { destino: 'San Sebastián, España', tipo_viaje: [ 'gastronomia', 'playas', 'culturales' ], costo_estimado: 230, ideal_para: 'En Pareja' },
-    { destino: 'Florencia, Italia', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 200, ideal_para: 'En Pareja' },
+    { destino: 'Florencia, Italia', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 230, ideal_para: 'En Pareja' },
     { destino: 'Edimburgo, Escocia', tipo_viaje: [ 'culturales', 'vidaNocturna', 'festivales' ], costo_estimado: 240, ideal_para: 'Con Amigos' },
-    { destino: 'Oporto, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 120, ideal_para: 'En Pareja' },
+    { destino: 'Oporto, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 220, ideal_para: 'En Pareja' },
     { destino: 'Chicago, Estados Unidos', tipo_viaje: [ 'gastronomia', 'festivales', 'vidaNocturna' ], costo_estimado: 260, ideal_para: 'Con Amigos' },
-    { destino: 'Cartagena, Colombia', tipo_viaje: [ 'playas', 'culturales', 'vidaNocturna' ], costo_estimado: 130, ideal_para: 'En Pareja' },
-    { destino: 'Valencia, España', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 150, ideal_para: 'En Familia' },
-    { destino: 'Budapest, Hungría', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 170, ideal_para: 'Con Amigos' },
+    { destino: 'Cartagena, Colombia', tipo_viaje: [ 'playas', 'culturales', 'vidaNocturna' ], costo_estimado: 150, ideal_para: 'En Pareja' },
+    { destino: 'Valencia, España', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 190, ideal_para: 'En Familia' },
+    { destino: 'Budapest, Hungría', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 220, ideal_para: 'Con Amigos' },
     { destino: 'Zacatecas, México', tipo_viaje: [ 'culturales', 'vidaNocturna' ], costo_estimado: 70, ideal_para: 'En Pareja' },
-    { destino: 'Morelia, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 80, ideal_para: 'En Familia' },
+    { destino: 'Morelia, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 70, ideal_para: 'En Familia' },
     { destino: 'Ixtapa-Zihuatanejo, México', tipo_viaje: [ 'playas', 'gastronomia', 'naturaleza' ], costo_estimado: 130, ideal_para: 'En Familia' },
     { destino: 'Campeche, México', tipo_viaje: [ 'culturales', 'playas', 'gastronomia' ], costo_estimado: 90, ideal_para: 'En Pareja' },
     { destino: 'Monterrey, México', tipo_viaje: [ 'gastronomia', 'naturaleza', 'vidaNocturna' ], costo_estimado: 110, ideal_para: 'Con Amigos' },
@@ -72,17 +72,17 @@ const destinos = [
     { destino: 'Tequila, México', tipo_viaje: [ 'gastronomia', 'culturales', 'festivales' ], costo_estimado: 100, ideal_para: 'Con Amigos' },
     { destino: 'Huatulco, México', tipo_viaje: [ 'playas', 'naturaleza' ], costo_estimado: 140, ideal_para: 'En Familia' },
     { destino: 'Chihuahua, México', tipo_viaje: [ 'naturaleza', 'culturales' ], costo_estimado: 120, ideal_para: 'Solo' },
-    { destino: 'Berlín, Alemania', tipo_viaje: [ 'culturales', 'vidaNocturna', 'festivales' ], costo_estimado: 198, ideal_para: 'Con Amigos' },
-    { destino: 'Lima, Perú', tipo_viaje: [ 'gastronomia', 'culturales' ], costo_estimado: 98, ideal_para: 'Solo' },
+    { destino: 'Berlín, Alemania', tipo_viaje: [ 'culturales', 'vidaNocturna', 'festivales' ], costo_estimado: 298, ideal_para: 'Con Amigos' },
+    { destino: 'Lima, Perú', tipo_viaje: [ 'gastronomia', 'culturales' ], costo_estimado: 198, ideal_para: 'Solo' },
     { destino: 'Sídney, Australia', tipo_viaje: [ 'playas', 'naturaleza', 'vidaNocturna' ], costo_estimado: 260, ideal_para: 'Con Amigos' },
-    { destino: 'Estocolmo, Suecia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 235, ideal_para: 'En Pareja' },
+    { destino: 'Estocolmo, Suecia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 275, ideal_para: 'En Pareja' },
     { destino: 'Nueva Orleans, Estados Unidos', tipo_viaje: [ 'gastronomia', 'festivales', 'vidaNocturna', 'culturales' ], costo_estimado: 285, ideal_para: 'Con Amigos' },
-    { destino: 'Cracovia, Polonia', tipo_viaje: [ 'culturales', 'vidaNocturna' ], costo_estimado: 110, ideal_para: 'Solo' },
-    { destino: 'Ho Chi Minh, Vietnam', tipo_viaje: [ 'gastronomia', 'culturales', 'vidaNocturna' ], costo_estimado: 79, ideal_para: 'Solo' },
-    { destino: 'Atenas, Grecia', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 173, ideal_para: 'En Pareja' },
-    { destino: 'Bali, Indonesia', tipo_viaje: [ 'naturaleza', 'playas', 'culturales' ], costo_estimado: 123, ideal_para: 'En Pareja' },
+    { destino: 'Cracovia, Polonia', tipo_viaje: [ 'culturales', 'vidaNocturna' ], costo_estimado: 210, ideal_para: 'Solo' },
+    { destino: 'Ho Chi Minh, Vietnam', tipo_viaje: [ 'gastronomia', 'culturales', 'vidaNocturna' ], costo_estimado: 179, ideal_para: 'Solo' },
+    { destino: 'Atenas, Grecia', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 273, ideal_para: 'En Pareja' },
+    { destino: 'Bali, Indonesia', tipo_viaje: [ 'naturaleza', 'playas', 'culturales' ], costo_estimado: 223, ideal_para: 'En Pareja' },
     { destino: 'Vancouver, Canadá', tipo_viaje: [ 'naturaleza', 'gastronomia', 'culturales' ], costo_estimado: 248, ideal_para: 'En Familia' },
-    { destino: 'Zanzíbar, Tanzania', tipo_viaje: [ 'playas', 'culturales', 'naturaleza' ], costo_estimado: 148, ideal_para: 'En Pareja' }
+    { destino: 'Zanzíbar, Tanzania', tipo_viaje: [ 'playas', 'culturales', 'naturaleza' ], costo_estimado: 248, ideal_para: 'En Pareja' }
     
 ];
 
@@ -103,11 +103,11 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
 
 // Categorizes budget based on an estimated total cost for a 5-day trip.
 function categorizarPresupuesto(costoDiario: number): string {
-  const costoTotalEstimado = costoDiario * 5;
-  if (costoTotalEstimado < 400) return presupuestos[0]; // Muy bajo
-  if (costoTotalEstimado <= 700) return presupuestos[1]; // Bajo
-  if (costoTotalEstimado <= 1000) return presupuestos[2]; // Medio
-  if (costoTotalEstimado <= 1500) return presupuestos[3]; // Alto
+  const costoTotalEstimado = costoDiario;
+  if (costoTotalEstimado < 70) return presupuestos[0]; // Muy bajo
+  if (costoTotalEstimado <= 100) return presupuestos[1]; // Bajo
+  if (costoTotalEstimado <= 150) return presupuestos[2]; // Medio
+  if (costoTotalEstimado <= 230) return presupuestos[3]; // Alto
   return presupuestos[4]; // Muy alto
 }
 
