@@ -61,7 +61,29 @@ const destinos = [
     { destino: 'Chicago, Estados Unidos', tipo_viaje: [ 'gastronomia', 'festivales', 'vidaNocturna' ], costo_estimado: 250, ideal_para: 'Con Amigos' },
     { destino: 'Cartagena, Colombia', tipo_viaje: [ 'playas', 'culturales', 'vidaNocturna' ], costo_estimado: 120, ideal_para: 'En Pareja' },
     { destino: 'Valencia, España', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 140, ideal_para: 'En Familia' },
-    { destino: 'Budapest, Hungría', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 160, ideal_para: 'Con Amigos' }
+    { destino: 'Budapest, Hungría', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 160, ideal_para: 'Con Amigos' },
+    { destino: 'Zacatecas, México', tipo_viaje: [ 'culturales', 'vidaNocturna' ], costo_estimado: 70, ideal_para: 'En Pareja' },
+    { destino: 'Morelia, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 80, ideal_para: 'En Familia' },
+    { destino: 'Ixtapa-Zihuatanejo, México', tipo_viaje: [ 'playas', 'gastronomia', 'naturaleza' ], costo_estimado: 130, ideal_para: 'En Familia' },
+    { destino: 'Campeche, México', tipo_viaje: [ 'culturales', 'playas', 'gastronomia' ], costo_estimado: 90, ideal_para: 'En Pareja' },
+    { destino: 'Monterrey, México', tipo_viaje: [ 'gastronomia', 'naturaleza', 'vidaNocturna' ], costo_estimado: 110, ideal_para: 'Con Amigos' },
+    { destino: 'Taxco, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 75, ideal_para: 'En Pareja' },
+    { destino: 'Veracruz, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'culturales' ], costo_estimado: 95, ideal_para: 'En Familia' },
+    { destino: 'Tequila, México', tipo_viaje: [ 'gastronomia', 'culturales', 'festivales' ], costo_estimado: 100, ideal_para: 'Con Amigos' },
+    { destino: 'Huatulco, México', tipo_viaje: [ 'playas', 'naturaleza' ], costo_estimado: 140, ideal_para: 'En Familia' },
+    { destino: 'Chihuahua, México', tipo_viaje: [ 'naturaleza', 'culturales' ], costo_estimado: 120, ideal_para: 'Solo' },
+    { destino: 'Berlín, Alemania', tipo_viaje: [ 'culturales', 'vidaNocturna', 'festivales' ], costo_estimado: 150, ideal_para: 'Con Amigos' },
+    { destino: 'Lima, Perú', tipo_viaje: [ 'gastronomia', 'culturales' ], costo_estimado: 70, ideal_para: 'Solo' },
+    { destino: 'Sídney, Australia', tipo_viaje: [ 'playas', 'naturaleza', 'vidaNocturna' ], costo_estimado: 200, ideal_para: 'Con Amigos' },
+    { destino: 'Estocolmo, Suecia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 180, ideal_para: 'En Pareja' },
+    { destino: 'Nueva Orleans, Estados Unidos', tipo_viaje: [ 'gastronomia', 'festivales', 'vidaNocturna', 'culturales' ], costo_estimado: 220, ideal_para: 'Con Amigos' },
+    { destino: 'Cracovia, Polonia', tipo_viaje: [ 'culturales', 'vidaNocturna' ], costo_estimado: 80, ideal_para: 'Solo' },
+    { destino: 'Ho Chi Minh, Vietnam', tipo_viaje: [ 'gastronomia', 'culturales', 'vidaNocturna' ], costo_estimado: 55, ideal_para: 'Solo' },
+    { destino: 'Atenas, Grecia', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 130, ideal_para: 'En Pareja' },
+    { destino: 'Bali, Indonesia', tipo_viaje: [ 'naturaleza', 'playas', 'culturales' ], costo_estimado: 90, ideal_para: 'En Pareja' },
+    { destino: 'Vancouver, Canadá', tipo_viaje: [ 'naturaleza', 'gastronomia', 'culturales' ], costo_estimado: 190, ideal_para: 'En Familia' },
+    { destino: 'Zanzíbar, Tanzania', tipo_viaje: [ 'playas', 'culturales', 'naturaleza' ], costo_estimado: 110, ideal_para: 'En Pareja' }
+    
 ];
 
 // --- Recommendation Logic ---
@@ -127,7 +149,14 @@ export function recomendarDestino(usuario: UserProfile): { nombre: string; score
     };
   });
   
-  if(resultados.length === 0) return null;
+  if (resultados.length === 0) return null;
 
-  return resultados.sort((a, b) => b.score - a.score)[0];
+  const sortedResultados = resultados.sort((a, b) => b.score - a.score);
+  
+  const top5 = sortedResultados.slice(0, 5);
+
+  if (top5.length === 0) return null;
+
+  const randomIndex = Math.floor(Math.random() * top5.length);
+  return top5[randomIndex];
 }
