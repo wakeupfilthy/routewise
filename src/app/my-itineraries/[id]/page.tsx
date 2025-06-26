@@ -63,7 +63,7 @@ export default function ItineraryDetailPage() {
         );
     }
 
-    const { tripName, destination, duration, dates, summary, itinerary: dailyPlan } = itinerary;
+    const { tripName, destination, duration, dates, resumen, gastos, itinerary: dailyPlan } = itinerary;
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -88,32 +88,38 @@ export default function ItineraryDetailPage() {
                     <p className="text-muted-foreground">{dates}</p>
                 </div>
                 
-                <div className="max-w-2xl mx-auto">
-                    {summary && (
+                <div className="max-w-3xl mx-auto">
+                    {resumen && (
+                        <Card className="mb-8 bg-card border-border shadow-md">
+                            <CardHeader>
+                                <CardTitle className="text-center text-xl font-headline font-semibold">Tu Experiencia de Viaje</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-center text-muted-foreground font-body">{resumen}</p>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {gastos && (
                         <Card className="mb-8 bg-primary/10 border-primary/30 shadow-lg">
                             <CardHeader>
-                                <CardTitle className="text-center text-2xl font-headline font-semibold">Resumen de Costos</CardTitle>
+                                <CardTitle className="text-center text-2xl font-headline font-semibold">Gastos Estimados (USD)</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
                                     {[
-                                        { label: 'Vuelos', value: summary.vuelos },
-                                        { label: 'Alojamiento', value: summary.alojamiento },
-                                        { label: 'Transporte Local', value: summary.transporteLocal },
-                                        { label: 'Alimentación', value: summary.alimentacion },
-                                        { label: 'Actividades y Entradas', value: summary.actividades },
-                                        { label: 'Extras y Contingencia', value: summary.extras },
+                                        { label: 'Transporte (p.p.)', value: gastos.transporte },
+                                        { label: 'Alojamiento (total)', value: gastos.alojamiento },
+                                        { label: 'Comida (diario p.p.)', value: gastos.comidaDiaria },
+                                        { label: 'Actividades (total)', value: gastos.actividades },
                                     ].map(item => (
-                                        <div key={item.label} className="flex justify-between items-center text-sm font-body">
-                                            <span className="text-muted-foreground">{item.label}</span>
-                                            <span className="font-semibold">{item.value}</span>
-                                        </div>
+                                        item.value && (
+                                            <div key={item.label} className="flex justify-between items-center text-sm font-body">
+                                                <span className="text-muted-foreground">{item.label}</span>
+                                                <span className="font-semibold">{item.value}</span>
+                                            </div>
+                                        )
                                     ))}
-                                </div>
-                                <div className="border-t border-primary/30 my-4"></div>
-                                <div className="flex justify-between items-center font-bold text-lg font-body">
-                                    <span>TOTAL:</span>
-                                    <span>{summary.total}</span>
                                 </div>
                                 <p className="text-xs text-muted-foreground text-center mt-4">
                                     Los precios son referenciales y pueden variar.
@@ -123,16 +129,36 @@ export default function ItineraryDetailPage() {
                     )}
 
                     <div className="space-y-6">
+                        <h2 className="text-2xl font-headline font-bold text-center mb-4">Itinerario Detallado</h2>
                         {dailyPlan.map((day, index) => (
-                            <div key={index}>
-                                <h2 className="text-xl font-headline font-bold mb-3">Día {day.day}</h2>
-                                <Card className="bg-primary/10 border-primary/30 shadow-lg">
-                                    <CardContent className="p-4 font-body">
-                                        <p className="font-bold text-base">{day.time}: {day.title}</p>
-                                        <p className="text-muted-foreground mt-2 text-sm">{day.description}</p>
-                                    </CardContent>
-                                </Card>
-                            </div>
+                            <Card key={index} className="bg-primary/10 border-primary/30 shadow-lg overflow-hidden">
+                                <CardHeader className="bg-primary/20 p-4">
+                                    <CardTitle className="text-lg font-headline font-semibold">Día {day.day}: {day.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-4 font-body space-y-4">
+                                    <div>
+                                        <h4 className="font-bold text-base">🗓️ Horario: {day.schedule}</h4>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-base">📍 Actividades</h4>
+                                        <p className="text-muted-foreground mt-1 text-sm">{day.activities}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-base">🍽️ Sugerencias Gastronómicas</h4>
+                                        <p className="text-muted-foreground mt-1 text-sm">{day.foodSuggestions}</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-base">💡 Recomendaciones</h4>
+                                        <p className="text-muted-foreground mt-1 text-sm">{day.companionRecommendations}</p>
+                                    </div>
+                                    {day.events && (
+                                        <div>
+                                            <h4 className="font-bold text-base">🎉 Eventos Especiales</h4>
+                                            <p className="text-muted-foreground mt-1 text-sm">{day.events}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
                 </div>
