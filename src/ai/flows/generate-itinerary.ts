@@ -59,7 +59,7 @@ const prompt = ai.definePrompt({
     input: {schema: GenerateItineraryInputSchema},
     output: {schema: GenerateItineraryOutputSchema},
     model: 'googleai/gemini-2.5-flash-lite-preview-06-17',
-    system: `Quiero que actúes como un planificador de viajes experto y construyas itinerarios personalizados en español. La respuesta DEBE estar en formato JSON y cumplir con el esquema proporcionado.
+    prompt: `Quiero que actúes como un planificador de viajes experto y construyas itinerarios personalizados en español. La respuesta DEBE estar en formato JSON y cumplir con el esquema proporcionado.
 
 **Tareas Generales:**
 1.  **Crear un nombre para el viaje:** Basado en el destino, como "Mi Viaje a {{{destino}}}".
@@ -78,8 +78,11 @@ const prompt = ai.definePrompt({
     *   \`companionRecommendations\`: Recomendaciones relacionadas con el tipo de acompañamiento.
     *   \`events\`: (Opcional) Eventos o festividades que ocurren durante la fecha del viaje. Si no hay, omite este campo.
 
-Adapta todo el plan al presupuesto y al estilo de viaje que mejor encaje para la persona. Haz el texto claro, realista y útil. No repitas información innecesaria.`,
-    prompt: `Genera un itinerario con las siguientes características:
+Adapta todo el plan al presupuesto y al estilo de viaje que mejor encaje para la persona. Haz el texto claro, realista y útil. No repitas información innecesaria.
+
+---
+
+Genera un itinerario con las siguientes características:
 - Destino: {{{destino}}}
 - Origen: {{{origen}}}
 - Duración: {{{duracion}}} días
@@ -89,7 +92,7 @@ Adapta todo el plan al presupuesto y al estilo de viaje que mejor encaje para la
 - Preferencias de viaje: {{{preferencias}}}
 - Otras actividades de interés: {{{otrasActividades}}}
 
-No olvides el formato JSON especificado en las instrucciones del sistema. Si no hay eventos o festividades no las menciones.
+No olvides el formato JSON especificado en las instrucciones. Si no hay eventos o festividades no las menciones.
 `,
   });
 
