@@ -27,72 +27,41 @@ export const acompanantes = ["Solo", "En Pareja", "En Familia", "Con Amigos"];
 // --- Destination Data ---
 
 const destinos = [
-  {
-    destino: "Holbox, México",
-    tipo_viaje: ["playas", "naturaleza", "spa"],
-    costo_estimado: 150, // Daily cost per person
-    ideal_para: "En Pareja"
-  },
-  {
-    destino: "Tulum, México",
-    tipo_viaje: ["playas", "vidaNocturna", "culturales", "spa"],
-    costo_estimado: 250,
-    ideal_para: "Con Amigos"
-  },
-  {
-    destino: "Oaxaca, México",
-    tipo_viaje: ["gastronomia", "culturales", "naturaleza"],
-    costo_estimado: 90,
-    ideal_para: "En Pareja"
-  },
-  {
-    destino: "Ciudad de México, México",
-    tipo_viaje: ["culturales", "gastronomia", "vidaNocturna", "compras"],
-    costo_estimado: 120,
-    ideal_para: "Con Amigos"
-  },
-  {
-    destino: "Kyoto, Japón",
-    tipo_viaje: ["culturales", "naturaleza", "gastronomia", "spa"],
-    costo_estimado: 180,
-    ideal_para: "En Pareja"
-  },
-  {
-    destino: "Roma, Italia",
-    tipo_viaje: ["culturales", "gastronomia", "compras"],
-    costo_estimado: 220,
-    ideal_para: "En Pareja"
-  },
-  {
-    destino: "Parque Nacional Zion, USA",
-    tipo_viaje: ["naturaleza"],
-    costo_estimado: 160,
-    ideal_para: "En Familia"
-  },
-  {
-    destino: "Bangkok, Tailandia",
-    tipo_viaje: ["gastronomia", "vidaNocturna", "compras", "culturales"],
-    costo_estimado: 70,
-    ideal_para: "Solo"
-  },
-  {
-    destino: "Las Vegas, USA",
-    tipo_viaje: ["vidaNocturna", "festivales", "compras", "gastronomia"],
-    costo_estimado: 300,
-    ideal_para: "Con Amigos"
-  },
-  {
-    destino: "Islandia",
-    tipo_viaje: ["naturaleza", "spa"],
-    costo_estimado: 280,
-    ideal_para: "En Pareja"
-  },
-  {
-    destino: "Riviera Maya, México",
-    tipo_viaje: ["playas", "spa", "naturaleza"],
-    costo_estimado: 240,
-    ideal_para: "En Familia"
-  }
+    { destino: 'Holbox, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 120, ideal_para: 'En Pareja' },
+    { destino: 'Tulum, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'culturales', 'spa' ], costo_estimado: 200, ideal_para: 'Con Amigos' },
+    { destino: 'Kioto, Japón', tipo_viaje: [ 'culturales', 'gastronomia', 'naturaleza', 'festivales' ], costo_estimado: 250, ideal_para: 'En Pareja' },
+    { destino: 'Oaxaca de Juárez, México', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 100, ideal_para: 'Solo' },
+    { destino: 'Bangkok, Tailandia', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 130, ideal_para: 'Con Amigos' },
+    { destino: 'Buenos Aires, Argentina', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 130, ideal_para: 'En Pareja' },
+    { destino: 'Riviera Maya, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 250, ideal_para: 'En Familia' },
+    { destino: 'Roma, Italia', tipo_viaje: [ 'culturales', 'gastronomia', 'compras' ], costo_estimado: 270, ideal_para: 'En Pareja' },
+    { destino: 'Ciudad de México, México', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna', 'festivales' ], costo_estimado: 110, ideal_para: 'Solo' },
+    { destino: 'San Miguel de Allende, México', tipo_viaje: [ 'culturales', 'gastronomia', 'spa' ], costo_estimado: 60, ideal_para: 'En Pareja' },
+    { destino: 'Puerto Escondido, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'naturaleza' ], costo_estimado: 125, ideal_para: 'Con Amigos' },
+    { destino: 'Medellín, Colombia', tipo_viaje: [ 'culturales', 'vidaNocturna', 'naturaleza' ], costo_estimado: 65, ideal_para: 'Con Amigos' },
+    { destino: 'Lisboa, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 190, ideal_para: 'En Pareja' },
+    { destino: 'Praga, República Checa', tipo_viaje: [ 'culturales', 'vidaNocturna', 'compras' ], costo_estimado: 200, ideal_para: 'Con Amigos' },
+    { destino: 'Chiang Mai, Tailandia', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia', 'spa' ], costo_estimado: 105, ideal_para: 'Solo' },
+    { destino: 'Cusco, Perú', tipo_viaje: [ 'culturales', 'naturaleza', 'gastronomia' ], costo_estimado: 110, ideal_para: 'Solo' },
+    { destino: 'Mazatlán, México', tipo_viaje: [ 'playas', 'vidaNocturna', 'gastronomia', 'festivales' ], costo_estimado: 150, ideal_para: 'En Familia' },
+    { destino: 'Palenque, México', tipo_viaje: [ 'culturales', 'naturaleza' ], costo_estimado: 90, ideal_para: 'Solo' },
+    { destino: 'Viena, Austria', tipo_viaje: [ 'culturales', 'gastronomia', 'festivales' ], costo_estimado: 195, ideal_para: 'En Pareja' },
+    { destino: 'Ciudad del Cabo, Sudáfrica', tipo_viaje: [ 'naturaleza', 'culturales', 'gastronomia', 'playas' ], costo_estimado: 190, ideal_para: 'En Pareja' },
+    { destino: 'Río de Janeiro, Brasil', tipo_viaje: [ 'playas', 'vidaNocturna', 'naturaleza', 'festivales' ], costo_estimado: 148, ideal_para: 'Con Amigos' },
+    { destino: 'Dublín, Irlanda', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 210, ideal_para: 'Con Amigos' },
+    { destino: 'Mérida, México', tipo_viaje: [ 'culturales', 'gastronomia', 'naturaleza' ], costo_estimado: 100, ideal_para: 'En Familia' },
+    { destino: 'Marrakech, Marruecos', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 85, ideal_para: 'Solo' },
+    { destino: 'Bacalar, México', tipo_viaje: [ 'playas', 'naturaleza', 'spa' ], costo_estimado: 75, ideal_para: 'En Pareja' },
+    { destino: 'Guadalajara, México', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna', 'festivales' ], costo_estimado: 85, ideal_para: 'Con Amigos' },
+    { destino: 'Puebla, México', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 60, ideal_para: 'En Familia' },
+    { destino: 'San Sebastián, España', tipo_viaje: [ 'gastronomia', 'playas', 'culturales' ], costo_estimado: 220, ideal_para: 'En Pareja' },
+    { destino: 'Florencia, Italia', tipo_viaje: [ 'culturales', 'gastronomia' ], costo_estimado: 190, ideal_para: 'En Pareja' },
+    { destino: 'Edimburgo, Escocia', tipo_viaje: [ 'culturales', 'vidaNocturna', 'festivales' ], costo_estimado: 230, ideal_para: 'Con Amigos' },
+    { destino: 'Oporto, Portugal', tipo_viaje: [ 'culturales', 'gastronomia', 'vidaNocturna' ], costo_estimado: 110, ideal_para: 'En Pareja' },
+    { destino: 'Chicago, Estados Unidos', tipo_viaje: [ 'gastronomia', 'festivales', 'vidaNocturna' ], costo_estimado: 250, ideal_para: 'Con Amigos' },
+    { destino: 'Cartagena, Colombia', tipo_viaje: [ 'playas', 'culturales', 'vidaNocturna' ], costo_estimado: 120, ideal_para: 'En Pareja' },
+    { destino: 'Valencia, España', tipo_viaje: [ 'culturales', 'gastronomia', 'playas' ], costo_estimado: 140, ideal_para: 'En Familia' },
+    { destino: 'Budapest, Hungría', tipo_viaje: [ 'culturales', 'vidaNocturna', 'gastronomia' ], costo_estimado: 160, ideal_para: 'Con Amigos' }
 ];
 
 // --- Recommendation Logic ---
