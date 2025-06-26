@@ -65,7 +65,7 @@ const prompt = ai.definePrompt({
 **Instrucciones Generales:**
 1.  **Formato JSON:** Tu respuesta DEBE ser un único objeto JSON válido que se ajuste al esquema de salida.
 2.  **Idioma:** Toda la respuesta debe estar en español.
-3.  **Realismo:** Adapta todas las sugerencias al presupuesto, preferencias y tipo de acompañantes indicados. Sé claro, realista y útil.
+3.  **Realismo:** Adapta todas las sugerencias al presupuesto, preferencias y tipo de acompañantes indicados. Asegúrate de que las actividades recomendadas estén directamente relacionadas con las **preferencias** del usuario. Sé claro, realista y útil.
 4.  **Detalles del Viaje:**
     - \`tripName\`: Crea un nombre corto y atractivo para el viaje.
     - \`destination\`, \`duration\`, \`dates\`: Confirma estos detalles basándote en la entrada. Las fechas deben calcularse a partir de la fecha de salida y la duración.
