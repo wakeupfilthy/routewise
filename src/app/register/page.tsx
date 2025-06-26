@@ -17,9 +17,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { auth, db } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 
 const formSchema = z.object({
     username: z.string().min(3, { message: 'El nombre de usuario debe tener al menos 3 caracteres.' }),
@@ -41,36 +38,31 @@ export default function RegisterPage() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-            const user = userCredential.user;
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userExists = users.some((user: any) => user.email === values.email);
 
-            await updateProfile(user, {
-                displayName: values.username,
-            });
-
-            await setDoc(doc(db, 'users', user.uid), {
-                username: values.username,
-                email: values.email,
-                uid: user.uid,
-            });
-
-            toast({
-                title: "¡Registro exitoso!",
-                description: "Ahora puedes iniciar sesión.",
-            });
-            router.push('/login');
-        } catch (error: any) {
-             let description = "Ocurrió un error inesperado durante el registro.";
-            if (error.code === 'auth/email-already-in-use') {
-                description = "Un usuario con este correo electrónico ya existe.";
-            }
+        if (userExists) {
             toast({
                 title: "Error de registro",
-                description: description,
+                description: "Un usuario con este correo electrónico ya existe.",
                 variant: "destructive",
             });
+            return;
         }
+
+        const newUser = {
+            uid: Date.now().toString(),
+            ...values,
+        };
+        
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+
+        toast({
+            title: "¡Registro exitoso!",
+            description: "Ahora puedes iniciar sesión.",
+        });
+        router.push('/login');
     }
 
     return (

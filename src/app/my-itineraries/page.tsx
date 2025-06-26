@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { ItineraryCard } from '@/components/itinerary-card';
 import { Search } from 'lucide-react';
-import type { SavedItinerary } from '@/lib/types';
+import type { SavedItinerary, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,9 +17,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
-import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { collection, query, orderBy, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 export default function MyItinerariesPage() {
     const [itineraries, setItineraries] = useState<SavedItinerary[]>([]);
@@ -27,47 +24,41 @@ export default function MyItinerariesPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [renamingItinerary, setRenamingItinerary] = useState<SavedItinerary | null>(null);
     const [newTripName, setNewTripName] = useState('');
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const router = useRouter();
 
-    const fetchItineraries = useCallback(async (uid: string) => {
-        const q = query(collection(db, 'users', uid, 'itineraries'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const fetchedItineraries = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            // Firestore timestamps need to be converted
-            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString();
-            return {
-                id: doc.id,
-                ...data,
-                createdAt,
-            } as SavedItinerary;
-        });
-        setItineraries(fetchedItineraries);
+    const fetchItineraries = useCallback((currentUser: UserProfile) => {
+        const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
+        const userItineraries = allItineraries.filter(it => it.userId === currentUser.uid)
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setItineraries(userItineraries);
     }, []);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                setUser(currentUser);
-                fetchItineraries(currentUser.uid);
-            } else {
-                router.push('/login');
-            }
-            setIsAuthLoading(false);
-        });
-        return () => unsubscribe();
+        const userJson = localStorage.getItem('currentUser');
+        if (userJson) {
+            const currentUser = JSON.parse(userJson);
+            setUser(currentUser);
+            fetchItineraries(currentUser);
+        } else {
+            router.push('/login');
+        }
+        setIsAuthLoading(false);
     }, [router, fetchItineraries]);
+
+    const updateLocalStorage = (updatedUserItineraries: SavedItinerary[]) => {
+        if (!user) return;
+        const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
+        const otherUserItineraries = allItineraries.filter(it => it.userId !== user.uid);
+        localStorage.setItem('itineraries', JSON.stringify([...otherUserItineraries, ...updatedUserItineraries]));
+    };
 
     const handleDelete = async (id: string) => {
         if (!user) return;
-        try {
-            await deleteDoc(doc(db, 'users', user.uid, 'itineraries', id));
-            setItineraries(prev => prev.filter(it => it.id !== id));
-        } catch (error) {
-            console.error("Error deleting itinerary: ", error);
-        }
+        const updatedUserItineraries = itineraries.filter(it => it.id !== id);
+        setItineraries(updatedUserItineraries);
+        updateLocalStorage(updatedUserItineraries);
     }
 
     const handleRenameRequest = (itinerary: SavedItinerary) => {
@@ -79,18 +70,16 @@ export default function MyItinerariesPage() {
     const handleRenameSubmit = async () => {
         if (!renamingItinerary || !newTripName.trim() || !user) return;
 
-        const docRef = doc(db, 'users', user.uid, 'itineraries', renamingItinerary.id);
-        try {
-            await updateDoc(docRef, { tripName: newTripName.trim() });
-            setItineraries(prev => prev.map(it =>
-                it.id === renamingItinerary.id ? { ...it, tripName: newTripName.trim() } : it
-            ));
-            setIsRenameDialogOpen(false);
-            setRenamingItinerary(null);
-            setNewTripName('');
-        } catch (error) {
-            console.error("Error renaming itinerary: ", error);
-        }
+        const updatedItineraries = itineraries.map(it =>
+            it.id === renamingItinerary.id ? { ...it, tripName: newTripName.trim() } : it
+        );
+        
+        setItineraries(updatedItineraries);
+        updateLocalStorage(updatedItineraries);
+
+        setIsRenameDialogOpen(false);
+        setRenamingItinerary(null);
+        setNewTripName('');
     };
 
     const filteredItineraries = itineraries.filter(it => 

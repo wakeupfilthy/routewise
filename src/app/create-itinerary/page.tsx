@@ -5,28 +5,23 @@ import { ItineraryForm } from '@/components/itinerary-form';
 import { generateItinerary } from '@/ai/flows/generate-itinerary';
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
-import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import type { UserProfile, SavedItinerary } from '@/lib/types';
 
 export default function CreateItineraryPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push('/login');
-      }
-      setIsAuthLoading(false);
-    });
-
-    return () => unsubscribe();
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      setUser(JSON.parse(userJson));
+    } else {
+      router.push('/login');
+    }
+    setIsAuthLoading(false);
   }, [router]);
 
   const handleGenerate = async (data: any) => {
@@ -53,14 +48,17 @@ export default function CreateItineraryPage() {
         return;
       }
       
-      const newItinerary = {
+      const newItinerary: SavedItinerary = {
+        id: Date.now().toString(),
         userId: user.uid,
-        createdAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
         ...result,
       };
-      
-      await addDoc(collection(db, 'users', user.uid, 'itineraries'), newItinerary);
 
+      const allItineraries = JSON.parse(localStorage.getItem('itineraries') || '[]');
+      allItineraries.push(newItinerary);
+      localStorage.setItem('itineraries', JSON.stringify(allItineraries));
+      
       router.push(`/my-itineraries`);
 
     } catch (e) {
@@ -83,7 +81,7 @@ export default function CreateItineraryPage() {
         setIsLoading(false);
     }
   };
-
+  
   if (isAuthLoading) {
     return (
         <div className="flex justify-center items-center h-screen">

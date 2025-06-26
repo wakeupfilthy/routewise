@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { SavedItinerary } from '@/lib/types';
+import type { SavedItinerary, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Edit2 } from 'lucide-react';
@@ -19,13 +19,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { generateDestinationImage } from '@/ai/flows/generate-destination-image';
-import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<SavedItinerary | null>(null);
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
@@ -33,15 +30,23 @@ export default function ItineraryDetailPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTripName, setNewTripName] = useState('');
 
+    const updateLocalStorageItinerary = (updatedItinerary: SavedItinerary) => {
+        const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
+        const index = allItineraries.findIndex(it => it.id === updatedItinerary.id);
+        if (index !== -1) {
+            allItineraries[index] = updatedItinerary;
+            localStorage.setItem('itineraries', JSON.stringify(allItineraries));
+        }
+    };
+
      const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
         if (!id || !user) return;
         try {
             const { imageUrl } = await generateDestinationImage({ destination: currentItinerary.destination });
             if (imageUrl) {
-                const docRef = doc(db, 'users', user.uid, 'itineraries', id);
-                await updateDoc(docRef, { imageUrl });
-
-                setItinerary(prev => prev ? { ...prev, imageUrl } : null);
+                const updatedItinerary = { ...currentItinerary, imageUrl };
+                setItinerary(updatedItinerary);
+                updateLocalStorageItinerary(updatedItinerary);
             }
         } catch (error) {
             console.error("Failed to generate destination image:", error);
@@ -49,52 +54,38 @@ export default function ItineraryDetailPage() {
     }, [id, user]);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                setUser(currentUser);
-            } else {
-                router.push('/login');
-            }
-        });
-
-        return () => unsubscribe();
+        const userJson = localStorage.getItem('currentUser');
+        if (userJson) {
+            setUser(JSON.parse(userJson));
+        } else {
+            router.push('/login');
+        }
     }, [router]);
 
     useEffect(() => {
         if (user && id) {
-            const fetchItinerary = async () => {
-                const docRef = doc(db, 'users', user.uid, 'itineraries', id);
-                const docSnap = await getDoc(docRef);
+            const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
+            const currentItinerary = allItineraries.find(it => it.id === id && it.userId === user.uid);
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString();
-                    const currentItinerary = {
-                        id: docSnap.id,
-                        ...data,
-                        createdAt,
-                    } as SavedItinerary;
-                    
-                    setItinerary(currentItinerary);
-                    setNewTripName(currentItinerary.tripName);
-                    if (!currentItinerary.imageUrl) {
-                        generateAndSaveImage(currentItinerary);
-                    }
-                } else {
-                    router.push('/my-itineraries');
+            if (currentItinerary) {
+                setItinerary(currentItinerary);
+                setNewTripName(currentItinerary.tripName);
+                if (!currentItinerary.imageUrl) {
+                    generateAndSaveImage(currentItinerary);
                 }
-            };
-            fetchItinerary();
+            } else {
+                router.push('/my-itineraries');
+            }
         }
     }, [id, router, user, generateAndSaveImage]);
 
     const handleRenameSubmit = async () => {
         if (!itinerary || !newTripName.trim() || !user) return;
         
-        const docRef = doc(db, 'users', user.uid, 'itineraries', id);
-        await updateDoc(docRef, { tripName: newTripName.trim() });
+        const updatedItinerary = { ...itinerary, tripName: newTripName.trim() };
+        setItinerary(updatedItinerary);
+        updateLocalStorageItinerary(updatedItinerary);
         
-        setItinerary(prev => prev ? { ...prev, tripName: newTripName.trim() } : null);
         setIsRenameDialogOpen(false);
     }
 

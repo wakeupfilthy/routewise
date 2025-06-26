@@ -5,24 +5,24 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Plane } from 'lucide-react';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import type { UserProfile } from '@/lib/types';
 
 export function SiteHeader() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-    });
-    
-    return () => unsubscribe();
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      setUser(JSON.parse(userJson));
+    }
   }, []);
 
-  const handleLogout = async () => {
-    await signOut(auth);
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    setUser(null);
     router.push('/');
+    setTimeout(() => window.location.reload(), 500);
   };
 
   return (
