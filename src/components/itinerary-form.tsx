@@ -192,9 +192,11 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Bajo">Bajo (ej. &lt;1000 USD)</SelectItem>
-                        <SelectItem value="Medio">Medio (ej. 1000-3000 USD)</SelectItem>
-                        <SelectItem value="Alto">Alto (ej. &gt;3000 USD)</SelectItem>
+                        <SelectItem value="Muy bajo">Muy bajo (&lt;400 USD)</SelectItem>
+                        <SelectItem value="Bajo">Bajo (400-700 USD)</SelectItem>
+                        <SelectItem value="Medio">Medio (700-1000 USD)</SelectItem>
+                        <SelectItem value="Alto">Alto (1000-1500 USD)</SelectItem>
+                        <SelectItem value="Muy alto">Muy alto (&gt;1500 USD)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
