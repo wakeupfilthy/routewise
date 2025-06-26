@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { SavedItinerary } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { generateDestinationImage } from '@/ai/flows/generate-destination-image';
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<SavedItinerary | null>(null);
@@ -29,6 +30,26 @@ export default function ItineraryDetailPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTripName, setNewTripName] = useState('');
 
+    const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
+        if (!id) return;
+        try {
+            const { imageUrl } = await generateDestinationImage({ destination: currentItinerary.destination });
+            if (imageUrl) {
+                const updatedItinerary = { ...currentItinerary, imageUrl };
+                
+                setItinerary(updatedItinerary);
+
+                const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+                const updatedItineraries = savedItineraries.map(it => 
+                    it.id === id ? updatedItinerary : it
+                );
+                localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+            }
+        } catch (error) {
+            console.error("Failed to generate destination image:", error);
+        }
+    }, [id]);
+
     useEffect(() => {
         if (id) {
             const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
@@ -36,11 +57,14 @@ export default function ItineraryDetailPage() {
             if (currentItinerary) {
                 setItinerary(currentItinerary);
                 setNewTripName(currentItinerary.tripName);
+                if (!currentItinerary.imageUrl) {
+                    generateAndSaveImage(currentItinerary);
+                }
             } else {
                 router.push('/my-itineraries');
             }
         }
-    }, [id, router]);
+    }, [id, router, generateAndSaveImage]);
 
     const handleRenameSubmit = () => {
         if (!itinerary || !newTripName.trim()) return;
@@ -64,7 +88,7 @@ export default function ItineraryDetailPage() {
         );
     }
 
-    const { tripName, destination, duration, dates, resumen, gastos, itinerary: dailyPlan, imageUrl } = itinerary;
+    const { tripName, destination, duration, dates, resumen, gastos, itinerario: dailyPlan, imageUrl } = itinerary;
     const city = destination.split(',')[0];
 
     return (
@@ -79,14 +103,20 @@ export default function ItineraryDetailPage() {
 
             <main className="flex-grow container mx-auto px-4 pb-8">
                 <div className="relative h-56 md:h-72 rounded-lg overflow-hidden -mx-4 md:mx-0 mb-8 shadow-lg">
-                    <Image
-                        src={imageUrl || `https://placehold.co/600x400.png`}
-                        alt={`Imagen de ${city}`}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={`${city} landscape`}
-                        priority
-                    />
+                    {imageUrl ? (
+                        <Image
+                            src={imageUrl}
+                            alt={`Imagen de ${city}`}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={`${city} landscape`}
+                            priority
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-secondary flex items-center justify-center">
+                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
 
