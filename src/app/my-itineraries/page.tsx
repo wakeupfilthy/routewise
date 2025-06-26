@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { ItineraryCard } from '@/components/itinerary-card';
-import { Search, MoreHorizontal } from 'lucide-react';
-import type { SavedItinerary, User } from '@/lib/types';
+import { Search } from 'lucide-react';
+import type { SavedItinerary } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,37 +17,57 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { collection, query, orderBy, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 export default function MyItinerariesPage() {
     const [itineraries, setItineraries] = useState<SavedItinerary[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isClient, setIsClient] = useState(false)
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [renamingItinerary, setRenamingItinerary] = useState<SavedItinerary | null>(null);
     const [newTripName, setNewTripName] = useState('');
     const [user, setUser] = useState<User | null>(null);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const router = useRouter();
 
-    useEffect(() => {
-        setIsClient(true);
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-            const userItinerariesKey = `itineraries_${parsedUser.username}`;
-            const saved = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
-            setItineraries(saved.sort((a: SavedItinerary, b: SavedItinerary) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-        } else {
-            router.push('/login');
-        }
-    }, [router]);
+    const fetchItineraries = useCallback(async (uid: string) => {
+        const q = query(collection(db, 'users', uid, 'itineraries'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const fetchedItineraries = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Firestore timestamps need to be converted
+            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt,
+            } as SavedItinerary;
+        });
+        setItineraries(fetchedItineraries);
+    }, []);
 
-    const handleDelete = (id: string) => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                fetchItineraries(currentUser.uid);
+            } else {
+                router.push('/login');
+            }
+            setIsAuthLoading(false);
+        });
+        return () => unsubscribe();
+    }, [router, fetchItineraries]);
+
+    const handleDelete = async (id: string) => {
         if (!user) return;
-        const userItinerariesKey = `itineraries_${user.username}`;
-        const updatedItineraries = itineraries.filter(it => it.id !== id);
-        setItineraries(updatedItineraries);
-        localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
+        try {
+            await deleteDoc(doc(db, 'users', user.uid, 'itineraries', id));
+            setItineraries(prev => prev.filter(it => it.id !== id));
+        } catch (error) {
+            console.error("Error deleting itinerary: ", error);
+        }
     }
 
     const handleRenameRequest = (itinerary: SavedItinerary) => {
@@ -56,19 +76,21 @@ export default function MyItinerariesPage() {
         setIsRenameDialogOpen(true);
     };
 
-    const handleRenameSubmit = () => {
+    const handleRenameSubmit = async () => {
         if (!renamingItinerary || !newTripName.trim() || !user) return;
 
-        const userItinerariesKey = `itineraries_${user.username}`;
-        const updatedItineraries = itineraries.map(it =>
-            it.id === renamingItinerary.id ? { ...it, tripName: newTripName.trim() } : it
-        );
-        setItineraries(updatedItineraries);
-        localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
-        
-        setIsRenameDialogOpen(false);
-        setRenamingItinerary(null);
-        setNewTripName('');
+        const docRef = doc(db, 'users', user.uid, 'itineraries', renamingItinerary.id);
+        try {
+            await updateDoc(docRef, { tripName: newTripName.trim() });
+            setItineraries(prev => prev.map(it =>
+                it.id === renamingItinerary.id ? { ...it, tripName: newTripName.trim() } : it
+            ));
+            setIsRenameDialogOpen(false);
+            setRenamingItinerary(null);
+            setNewTripName('');
+        } catch (error) {
+            console.error("Error renaming itinerary: ", error);
+        }
     };
 
     const filteredItineraries = itineraries.filter(it => 
@@ -76,7 +98,7 @@ export default function MyItinerariesPage() {
         it.destination.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
-    if (!isClient || !user) {
+    if (isAuthLoading) {
          return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>

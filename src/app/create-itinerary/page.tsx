@@ -5,27 +5,34 @@ import { ItineraryForm } from '@/components/itinerary-form';
 import { generateItinerary } from '@/ai/flows/generate-itinerary';
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
-import type { User } from '@/lib/types';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function CreateItineraryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
         router.push('/login');
-    }
+      }
+      setIsAuthLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [router]);
 
   const handleGenerate = async (data: any) => {
-    if (!user) { // Safety check
-        toast({ title: "Error", description: "Debes iniciar sesión para crear un itinerario.", variant: "destructive" });
-        return;
+    if (!user) {
+      toast({ title: "Error", description: "Debes iniciar sesión para crear un itinerario.", variant: "destructive" });
+      return;
     }
     setIsLoading(true);
     try {
@@ -47,30 +54,12 @@ export default function CreateItineraryPage() {
       }
       
       const newItinerary = {
-        id: `trip-${Date.now()}`,
-        createdAt: new Date().toISOString(),
+        userId: user.uid,
+        createdAt: serverTimestamp(),
         ...result,
       };
       
-      const storageKey = `itineraries_${user.username}`;
-      const savedItineraries = JSON.parse(localStorage.getItem(storageKey) || '[]');
-
-      savedItineraries.push(newItinerary);
-      
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(savedItineraries));
-      } catch (e) {
-        if (e instanceof Error && e.name === 'QuotaExceededError') {
-            toast({
-              title: "Error al guardar",
-              description: "No hay suficiente espacio para guardar más viajes. Por favor, elimina algunos itinerarios antiguos.",
-              variant: "destructive",
-            });
-            setIsLoading(false);
-            return;
-        }
-        throw e;
-      }
+      await addDoc(collection(db, 'users', user.uid, 'itineraries'), newItinerary);
 
       router.push(`/my-itineraries`);
 
@@ -95,7 +84,7 @@ export default function CreateItineraryPage() {
     }
   };
 
-  if (!user) {
+  if (isAuthLoading) {
     return (
         <div className="flex justify-center items-center h-screen">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>

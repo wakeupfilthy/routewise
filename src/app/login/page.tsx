@@ -17,6 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Por favor, ingresa un correo electrónico válido.' }),
@@ -35,19 +37,14 @@ export default function LoginPage() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const foundUser = users.find((user: any) => user.email === values.email && user.password === values.password);
-
-        if (foundUser) {
-            localStorage.setItem('currentUser', JSON.stringify(foundUser));
-            // Dispatch a storage event to notify other tabs/components
-            window.dispatchEvent(new Event("storage"));
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            await signInWithEmailAndPassword(auth, values.email, values.password);
             toast({
                 title: "¡Bienvenido de nuevo!",
             });
             router.push('/create-itinerary');
-        } else {
+        } catch (error) {
             toast({
                 title: "Error de inicio de sesión",
                 description: "Correo electrónico o contraseña incorrectos.",
