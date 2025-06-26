@@ -52,23 +52,18 @@ export default function ItineraryDetailPage() {
 
     useEffect(() => {
         const storedUser = localStorage.getItem('currentUser');
-        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        if (!storedUser) {
+            router.push('/login');
+            return;
+        }
+
+        const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
 
         if (id) {
-            let currentItinerary: SavedItinerary | undefined;
-
-            if (parsedUser) {
-                const userItinerariesKey = `itineraries_${parsedUser.username}`;
-                const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
-                currentItinerary = savedItineraries.find(it => it.id === id);
-            }
-
-            if (!currentItinerary) {
-                const guestItinerariesKey = 'itineraries_guest';
-                const guestItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(guestItinerariesKey) || '[]');
-                currentItinerary = guestItineraries.find(it => it.id === id);
-            }
+            const userItinerariesKey = `itineraries_${parsedUser.username}`;
+            const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
+            const currentItinerary = savedItineraries.find(it => it.id === id);
 
             if (currentItinerary) {
                 setItinerary(currentItinerary);

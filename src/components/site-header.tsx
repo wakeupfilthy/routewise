@@ -53,11 +53,11 @@ export function SiteHeader() {
           <nav className="flex items-center">
             {isClient && (
               <>
-                <Button variant="ghost" asChild>
-                    <Link href="/create-itinerary">Crear Viaje</Link>
-                </Button>
                 {user ? (
                   <>
+                    <Button variant="ghost" asChild>
+                        <Link href="/create-itinerary">Crear Viaje</Link>
+                    </Button>
                     <Button variant="ghost" asChild>
                         <Link href="/my-itineraries">Mis Itinerarios</Link>
                     </Button>
