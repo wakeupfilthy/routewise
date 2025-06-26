@@ -29,9 +29,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, Send } from 'lucide-react';
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { recomendarDestino, preferenciasItems, presupuestos, acompanantes } from '@/lib/destination-recommender';
 
 
 const formSchema = z.object({
+  recomendarDestino: z.boolean().optional(),
   destino: z.string().min(2, { message: 'Destino debe tener al menos 2 caracteres.' }),
   origen: z.string().min(2, { message: 'Origen debe tener al menos 2 caracteres.' }),
   duracion: z.string().min(1, { message: 'Duración es requerida.' }).regex(/^\d+$/, "Debe ser un número."),
@@ -44,17 +46,6 @@ const formSchema = z.object({
   otrasActividades: z.string().optional(),
 });
 
-const preferenciasItems = [
-    { id: 'culturales', label: 'Culturales' },
-    { id: 'naturaleza', label: 'Naturaleza' },
-    { id: 'festivales', label: 'Festivales y eventos' },
-    { id: 'playas', label: 'Playas' },
-    { id: 'gastronomia', label: 'Gastronomía' },
-    { id: 'spa', label: 'Spa y relajación' },
-    { id: 'vidaNocturna', label: 'Vida nocturna' },
-    { id: 'compras', label: 'Compras' },
-]
-
 type ItineraryFormProps = {
   onGenerate: (data: z.infer<typeof formSchema>) => void;
   isLoading: boolean;
@@ -64,11 +55,12 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      recomendarDestino: false,
       destino: '',
       origen: '',
       duracion: '5',
       fechaSalida: undefined,
-      presupuesto: 'Medio',
+      presupuesto: 'Medio (700-1000 USD)',
       acompanantes: 'Solo',
       preferencias: ['naturaleza'],
       otrasActividades: '',
@@ -77,12 +69,31 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
 
   const [isClient, setIsClient] = useState(false);
 
+  const watchPreferencias = form.watch('preferencias');
+  const watchPresupuesto = form.watch('presupuesto');
+  const watchAcompanantes = form.watch('acompanantes');
+  const watchRecomendar = form.watch('recomendarDestino');
+
   useEffect(() => {
       setIsClient(true);
       if (!form.getValues('fechaSalida')) {
           form.setValue('fechaSalida', new Date());
       }
   }, [form]);
+
+  useEffect(() => {
+    if (watchRecomendar) {
+        const userProfile = {
+            preferencias: watchPreferencias,
+            presupuesto: watchPresupuesto,
+            acompanantes: watchAcompanantes,
+        };
+        const recommendation = recomendarDestino(userProfile);
+        if (recommendation) {
+            form.setValue('destino', recommendation.nombre, { shouldValidate: true });
+        }
+    }
+  }, [watchPreferencias, watchPresupuesto, watchAcompanantes, watchRecomendar, form]);
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -94,6 +105,30 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 font-body">
             <h2 className="text-xl font-headline font-semibold">Detalles del viaje</h2>
+
+            <FormField
+                control={form.control}
+                name="recomendarDestino"
+                render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0 p-3 bg-primary/10 rounded-md border border-primary/20">
+                    <FormControl>
+                    <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                    />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                        <FormLabel className="font-semibold text-primary-foreground">
+                            Recomendar un destino
+                        </FormLabel>
+                        <FormDescription>
+                            Deja que nuestra IA elija el destino perfecto para ti.
+                        </FormDescription>
+                    </div>
+                </FormItem>
+                )}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -102,7 +137,7 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                   <FormItem>
                     <FormLabel>Destino (ciudad)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Seleccionar opción" {...field} />
+                      <Input placeholder="Ej. París, Francia" {...field} disabled={watchRecomendar} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -115,7 +150,7 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                   <FormItem>
                     <FormLabel>Origen</FormLabel>
                     <FormControl>
-                      <Input placeholder="Seleccionar opción" {...field} />
+                      <Input placeholder="Ej. Madrid, España" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -192,11 +227,9 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Muy bajo">Muy bajo (&lt;400 USD)</SelectItem>
-                        <SelectItem value="Bajo">Bajo (400-700 USD)</SelectItem>
-                        <SelectItem value="Medio">Medio (700-1000 USD)</SelectItem>
-                        <SelectItem value="Alto">Alto (1000-1500 USD)</SelectItem>
-                        <SelectItem value="Muy alto">Muy alto (&gt;1500 USD)</SelectItem>
+                        {presupuestos.map((p) => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -216,10 +249,9 @@ export function ItineraryForm({ onGenerate, isLoading }: ItineraryFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Solo">Solo</SelectItem>
-                        <SelectItem value="En Pareja">En Pareja</SelectItem>
-                        <SelectItem value="En Familia">En Familia</SelectItem>
-                        <SelectItem value="Con Amigos">Con Amigos</SelectItem>
+                        {acompanantes.map((a) => (
+                             <SelectItem key={a} value={a}>{a}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
