@@ -5,3 +5,9 @@ export interface SavedItinerary extends GenerateItineraryOutput {
     createdAt: string;
     imageUrl?: string;
 }
+
+export interface User {
+    username: string;
+    email: string;
+    password: string; // In a real app, this would be a hash.
+}

@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { ItineraryCard } from '@/components/itinerary-card';
-import { HomeIcon, PlaneIcon, BookmarkIcon, Search, MoreHorizontal } from 'lucide-react';
-import type { SavedItinerary } from '@/lib/types';
+import { Search, MoreHorizontal } from 'lucide-react';
+import type { SavedItinerary, User } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,17 +25,29 @@ export default function MyItinerariesPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [renamingItinerary, setRenamingItinerary] = useState<SavedItinerary | null>(null);
     const [newTripName, setNewTripName] = useState('');
+    const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
-        setIsClient(true)
-        const saved = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
-        setItineraries(saved.sort((a: SavedItinerary, b: SavedItinerary) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-    }, []);
+        setIsClient(true);
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            const userItinerariesKey = `itineraries_${parsedUser.username}`;
+            const saved = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
+            setItineraries(saved.sort((a: SavedItinerary, b: SavedItinerary) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        } else {
+            router.push('/login');
+        }
+    }, [router]);
 
     const handleDelete = (id: string) => {
+        if (!user) return;
+        const userItinerariesKey = `itineraries_${user.username}`;
         const updatedItineraries = itineraries.filter(it => it.id !== id);
         setItineraries(updatedItineraries);
-        localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+        localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
     }
 
     const handleRenameRequest = (itinerary: SavedItinerary) => {
@@ -44,13 +57,14 @@ export default function MyItinerariesPage() {
     };
 
     const handleRenameSubmit = () => {
-        if (!renamingItinerary || !newTripName.trim()) return;
+        if (!renamingItinerary || !newTripName.trim() || !user) return;
 
+        const userItinerariesKey = `itineraries_${user.username}`;
         const updatedItineraries = itineraries.map(it =>
             it.id === renamingItinerary.id ? { ...it, tripName: newTripName.trim() } : it
         );
         setItineraries(updatedItineraries);
-        localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+        localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
         
         setIsRenameDialogOpen(false);
         setRenamingItinerary(null);
@@ -62,32 +76,30 @@ export default function MyItinerariesPage() {
         it.destination.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
-    if (!isClient) {
-        return null;
+    if (!isClient || !user) {
+         return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col pb-20">
+        <div className="min-h-screen bg-background text-foreground flex flex-col">
             <main className="flex-grow container mx-auto px-4 py-8">
                 <header className="text-center mb-8">
-                    <h1 className="text-4xl md:text-5xl font-headline font-bold">MIS ITINERARIOS</h1>
-                    <div className='mt-2 text-muted-foreground'>
-                        <p className="text-md">Descubre tu siguiente destino</p>
-                        <p className="text-md">Aquí encontrarás los detalles del viaje de tus sueños para que vivas la mejor experiencia</p>
-                    </div>
+                    <h1 className="text-4xl md:text-5xl font-headline font-bold">Mis Itinerarios</h1>
+                    <p className="text-md text-muted-foreground mt-2">Aquí encontrarás todos tus viajes guardados.</p>
                 </header>
 
                 <div className="relative mb-8 max-w-lg mx-auto">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input 
-                        placeholder="Buscar" 
+                        placeholder="Buscar por nombre o destino..." 
                         className="pl-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2">
-                        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
-                    </Button>
                 </div>
 
                 <div className="space-y-6">
@@ -101,11 +113,14 @@ export default function MyItinerariesPage() {
                             />
                         ))
                     ) : (
-                        <div className="text-center py-12 text-muted-foreground">
-                            <p>No tienes viajes guardados.</p>
-                            <Button asChild variant="link" className="mt-2">
-                                <Link href="/">¡Crea tu primer itinerario!</Link>
-                            </Button>
+                        <div className="text-center py-12">
+                            <div className="text-center py-12 text-muted-foreground bg-card border rounded-lg">
+                                <h3 className="text-xl font-semibold text-foreground">No tienes viajes guardados</h3>
+                                <p className="mt-2">¡Parece que todavía no has planificado ninguna aventura!</p>
+                                <Button asChild variant="default" className="mt-4">
+                                    <Link href="/create-itinerary">Crea tu primer itinerario</Link>
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -141,20 +156,6 @@ export default function MyItinerariesPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-            <footer className="fixed bottom-0 left-0 right-0 bg-primary/20 backdrop-blur-sm border-t">
-                <div className="container mx-auto h-16 flex justify-around items-center text-gray-600">
-                    <Link href="/" className="flex flex-col items-center gap-1">
-                        <HomeIcon className="h-6 w-6" />
-                    </Link>
-                    <Link href="/" className="flex flex-col items-center p-3 bg-primary rounded-full text-primary-foreground -translate-y-6 shadow-lg border-4 border-background">
-                        <PlaneIcon className="h-8 w-8" />
-                    </Link>
-                    <Link href="/my-itineraries" className="flex flex-col items-center gap-1 text-primary">
-                        <BookmarkIcon className="h-6 w-6" />
-                    </Link>
-                </div>
-            </footer>
         </div>
     )
 }

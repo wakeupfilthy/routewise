@@ -1,23 +1,30 @@
 import type {Metadata} from 'next';
-import { Montserrat } from 'next/font/google';
+import { Playfair_Display, PT_Sans } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from '@/lib/utils';
+import { SiteHeader } from '@/components/site-header';
 
-const montserrat = Montserrat({
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-headline',
+  weight: ['700']
+});
+
+const ptSans = PT_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   weight: ['400', '700']
 });
 
 export const metadata: Metadata = {
-  title: 'Tripmate',
+  title: 'RouteWise',
   description: 'Tu compañero de viaje con IA.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Tripmate',
+    title: 'RouteWise',
   },
   formatDetection: {
     telephone: false,
@@ -37,8 +44,11 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head />
-      <body className={cn("font-body antialiased", montserrat.variable)}>
-        {children}
+      <body className={cn("min-h-screen bg-background font-body antialiased", ptSans.variable, playfair.variable)}>
+        <div className="relative flex min-h-screen flex-col">
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+        </div>
         <Toaster />
       </body>
     </html>

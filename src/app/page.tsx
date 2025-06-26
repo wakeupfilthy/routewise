@@ -1,129 +1,79 @@
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ItineraryForm } from '@/components/itinerary-form';
-import { generateItinerary } from '@/ai/flows/generate-itinerary';
-import { HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { format } from 'date-fns';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import { Plane, PenSquare, Compass } from 'lucide-react';
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Creando tu viaje perfecto...");
-  const { toast } = useToast();
-  const router = useRouter();
-
-  const handleGenerate = async (data: any) => {
-    setIsLoading(true);
-    try {
-      setLoadingMessage("Creando tu viaje perfecto...");
-      const formattedData = {
-        ...data,
-        fechaSalida: format(data.fechaSalida, 'yyyy-MM-dd'),
-        preferencias: data.preferencias.join(', '),
-      };
-      const result = await generateItinerary(formattedData);
-      
-      if (!result) {
-        toast({
-            title: "No se encontró itinerario",
-            description: "No pudimos encontrar un itinerario para tus preferencias. Intenta ajustar tu búsqueda.",
-            variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      const savedItineraries = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
-      const newItinerary = {
-        id: `trip-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        ...result,
-      };
-      savedItineraries.push(newItinerary);
-      
-      try {
-        localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries));
-      } catch (e) {
-        if (e instanceof Error && e.name === 'QuotaExceededError') {
-            toast({
-              title: "Error al guardar",
-              description: "No hay suficiente espacio para guardar más viajes. Por favor, elimina algunos itinerarios antiguos.",
-              variant: "destructive",
-            });
-            setIsLoading(false);
-            return;
-        }
-        throw e;
-      }
-
-      router.push(`/my-itineraries`);
-
-    } catch (e) {
-      let errorMessage = "No pudimos generar tu itinerario. Por favor, inténtalo de nuevo más tarde.";
-      if (e instanceof Error && e.message) {
-        if (e.message.includes('SAFETY')) {
-            errorMessage = 'Tu solicitud fue bloqueada por filtros de seguridad. Intenta con una descripción menos específica o diferente.';
-        } else if (e.message.includes('quota')) {
-            errorMessage = 'Se ha alcanzado el límite de solicitudes. Por favor, inténtalo más tarde.';
-        }
-      }
-
-      toast({
-        title: "Ocurrió un error",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      console.error(e);
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col pb-20">
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">
-            Tripmate
+    <div className="flex flex-col min-h-screen">
+      <section className="container grid lg:grid-cols-2 gap-12 items-center py-16 md:py-24">
+        <div className="space-y-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-gray-800">
+            Tu viaje soñado, a un clic de distancia.
           </h1>
-          <div className='mt-2 text-muted-foreground'>
-            <p className="text-md">
-              Ayúdanos a conocerte mejor
-            </p>
-            <p className="text-md">
-              Ingresa los detalles de tu viaje y recibe tu itinerario totalmente personalizado
-            </p>
-          </div>
-        </header>
-
-        <div className="max-w-2xl mx-auto">
-          <ItineraryForm onGenerate={handleGenerate} isLoading={isLoading} />
+          <p className="text-lg text-muted-foreground">
+            Con RouteWise, planificar tu próxima aventura es más fácil que nunca. Ingresa tus preferencias y deja que nuestra IA cree el itinerario perfecto para ti.
+          </p>
+          <Button size="lg" asChild className="text-lg py-6 px-8">
+            <Link href="/register">Comenzar ahora</Link>
+          </Button>
         </div>
-
-        {isLoading && (
-          <div className="text-center mt-12">
-            <div className="flex justify-center items-center gap-2">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="font-body text-muted-foreground">{loadingMessage}</p>
-            </div>
-          </div>
-        )}
-      </main>
+        <div className="relative h-80 lg:h-[450px] rounded-lg overflow-hidden shadow-2xl group">
+           <Image 
+                src="https://placehold.co/600x400.png"
+                alt="Collage de imágenes de viajes mostrando un mapa, una maleta y un pasaporte"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                data-ai-hint="travel collage"
+            />
+             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        </div>
+      </section>
       
-      <footer className="fixed bottom-0 left-0 right-0 bg-primary/20 backdrop-blur-sm border-t">
-        <div className="container mx-auto h-16 flex justify-around items-center text-gray-600">
-          <Link href="/" className="flex flex-col items-center gap-1 text-primary">
-            <HomeIcon className="h-6 w-6" />
-          </Link>
-          <Link href="/" className="flex flex-col items-center p-3 bg-primary rounded-full text-primary-foreground -translate-y-6 shadow-lg border-4 border-background">
-            <PlaneIcon className="h-8 w-8" />
-          </Link>
-          <Link href="/my-itineraries" className="flex flex-col items-center gap-1">
-            <BookmarkIcon className="h-6 w-6" />
-          </Link>
+      <section className="bg-muted py-20">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-headline">¿Cómo funciona?</h2>
+            <p className="text-muted-foreground mt-2">Tres simples pasos para tu próxima gran aventura.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="text-center">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/20 p-3 rounded-full w-fit">
+                        <PenSquare className="h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline text-2xl mt-4">1. Dinos tus gustos</CardTitle>
+                </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Completa un simple formulario con tu destino, presupuesto y qué te gusta hacer.</p>
+              </CardContent>
+            </Card>
+             <Card className="text-center">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/20 p-3 rounded-full w-fit">
+                        <Compass className="h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline text-2xl mt-4">2. Genera tu itinerario</CardTitle>
+                </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Nuestra IA analiza tus respuestas para crear un plan de viaje personalizado día por día.</p>
+              </CardContent>
+            </Card>
+             <Card className="text-center">
+                <CardHeader>
+                    <div className="mx-auto bg-primary/20 p-3 rounded-full w-fit">
+                        <Plane className="h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle className="font-headline text-2xl mt-4">3. Guarda y viaja</CardTitle>
+                </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Guarda tus itinerarios favoritos, accede a ellos cuando quieras y ¡prepárate para la aventura!</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }

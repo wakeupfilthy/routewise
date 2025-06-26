@@ -2,11 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import type { SavedItinerary } from '@/lib/types';
+import type { SavedItinerary, User } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ArrowLeft, Edit2, HomeIcon, PlaneIcon, BookmarkIcon } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, Edit2 } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -23,6 +22,7 @@ import { generateDestinationImage } from '@/ai/flows/generate-destination-image'
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<SavedItinerary | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
@@ -30,20 +30,20 @@ export default function ItineraryDetailPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTripName, setNewTripName] = useState('');
 
-    const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
-        if (!id) return;
+     const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary, currentUser: User) => {
+        if (!id || !currentUser) return;
         try {
             const { imageUrl } = await generateDestinationImage({ destination: currentItinerary.destination });
             if (imageUrl) {
                 const updatedItinerary = { ...currentItinerary, imageUrl };
-                
                 setItinerary(updatedItinerary);
 
-                const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+                const userItinerariesKey = `itineraries_${currentUser.username}`;
+                const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
                 const updatedItineraries = savedItineraries.map(it => 
                     it.id === id ? updatedItinerary : it
                 );
-                localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+                localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
             }
         } catch (error) {
             console.error("Failed to generate destination image:", error);
@@ -51,36 +51,45 @@ export default function ItineraryDetailPage() {
     }, [id]);
 
     useEffect(() => {
-        if (id) {
-            const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
-            const currentItinerary = savedItineraries.find(it => it.id === id);
-            if (currentItinerary) {
-                setItinerary(currentItinerary);
-                setNewTripName(currentItinerary.tripName);
-                if (!currentItinerary.imageUrl) {
-                    generateAndSaveImage(currentItinerary);
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            if (id) {
+                const userItinerariesKey = `itineraries_${parsedUser.username}`;
+                const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
+                const currentItinerary = savedItineraries.find(it => it.id === id);
+                if (currentItinerary) {
+                    setItinerary(currentItinerary);
+                    setNewTripName(currentItinerary.tripName);
+                    if (!currentItinerary.imageUrl) {
+                        generateAndSaveImage(currentItinerary, parsedUser);
+                    }
+                } else {
+                    router.push('/my-itineraries');
                 }
-            } else {
-                router.push('/my-itineraries');
             }
+        } else {
+            router.push('/login');
         }
     }, [id, router, generateAndSaveImage]);
 
     const handleRenameSubmit = () => {
-        if (!itinerary || !newTripName.trim()) return;
+        if (!itinerary || !newTripName.trim() || !user) return;
 
-        const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('savedItineraries') || '[]');
+        const userItinerariesKey = `itineraries_${user.username}`;
+        const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
         const updatedItineraries = savedItineraries.map(it => 
             it.id === id ? { ...it, tripName: newTripName.trim() } : it
         );
-        localStorage.setItem('savedItineraries', JSON.stringify(updatedItineraries));
+        localStorage.setItem(userItinerariesKey, JSON.stringify(updatedItineraries));
         
         setItinerary(prev => prev ? { ...prev, tripName: newTripName.trim() } : null);
         
         setIsRenameDialogOpen(false);
     }
 
-    if (!itinerary) {
+    if (!itinerary || !user) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
@@ -122,14 +131,16 @@ export default function ItineraryDetailPage() {
 
                 <div className="text-center mb-8 -mt-24 md:-mt-28 relative z-10">
                      <div className="flex justify-center items-center gap-2 text-white">
-                        <h1 className="text-3xl md:text-4xl font-headline font-bold drop-shadow-md">{tripName}</h1>
+                        <h1 className="text-3xl md:text-4xl font-headline font-bold text-white drop-shadow-md">{tripName}</h1>
                         <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-black/20">
                             <Edit2 className="h-5 w-5" />
                         </Button>
                     </div>
-                    <p className="text-foreground mt-1">{destination}</p>
-                    <p className="text-foreground">{duration}</p>
-                    <p className="text-foreground">{dates}</p>
+                     <div className="text-foreground mt-1">
+                        <p>{destination}</p>
+                        <p>{duration}</p>
+                        <p>{dates}</p>
+                    </div>
                 </div>
                 
                 <div className="max-w-3xl mx-auto">
@@ -257,20 +268,6 @@ export default function ItineraryDetailPage() {
                     </DialogFooterComponent>
                 </DialogContent>
             </Dialog>
-            
-            <footer className="sticky bottom-0 bg-primary/20 backdrop-blur-sm border-t mt-8">
-                <div className="container mx-auto h-16 flex justify-around items-center text-gray-600">
-                    <Link href="/" className="flex flex-col items-center gap-1">
-                        <HomeIcon className="h-6 w-6" />
-                    </Link>
-                    <Link href="/" className="flex flex-col items-center p-3 bg-primary rounded-full text-primary-foreground -translate-y-6 shadow-lg border-4 border-background">
-                        <PlaneIcon className="h-8 w-8" />
-                    </Link>
-                    <Link href="/my-itineraries" className="flex flex-col items-center gap-1 text-primary">
-                        <BookmarkIcon className="h-6 w-6" />
-                    </Link>
-                </div>
-            </footer>
         </div>
     );
 }
