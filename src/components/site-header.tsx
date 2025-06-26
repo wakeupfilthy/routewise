@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Plane } from 'lucide-react';
+import { Plane, ShieldCheck } from 'lucide-react';
 import type { UserProfile } from '@/lib/types';
 
 export function SiteHeader() {
@@ -39,6 +39,11 @@ export function SiteHeader() {
           <nav className="flex items-center">
             {user ? (
               <>
+                {user.isAdmin && (
+                  <Button variant="ghost" asChild>
+                    <Link href="/admin"><ShieldCheck className="mr-2 h-4 w-4" />Admin</Link>
+                  </Button>
+                )}
                 <Button variant="ghost" asChild>
                     <Link href="/create-itinerary">Crear Viaje</Link>
                 </Button>

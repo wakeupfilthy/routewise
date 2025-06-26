@@ -18,6 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+const ADMIN_EMAIL = 'admin@routewise.com';
+
 const formSchema = z.object({
     username: z.string().min(3, { message: 'El nombre de usuario debe tener al menos 3 caracteres.' }),
     email: z.string().email({ message: 'Por favor, ingresa un correo electrónico válido.' }),
@@ -38,6 +40,15 @@ export default function RegisterPage() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (values.email === ADMIN_EMAIL) {
+            toast({
+                title: "Error de registro",
+                description: "Este correo electrónico está reservado.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const userExists = users.some((user: any) => user.email === values.email);
 

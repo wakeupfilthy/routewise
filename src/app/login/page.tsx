@@ -19,6 +19,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { UserProfile } from '@/lib/types';
 
+const ADMIN_EMAIL = 'admin@routewise.com';
+const ADMIN_PASSWORD = 'adminpassword';
+
 const formSchema = z.object({
   email: z.string().email({ message: 'Por favor, ingresa un correo electrónico válido.' }),
   password: z.string().min(1, { message: 'La contraseña es requerida.' }),
@@ -37,6 +40,23 @@ export default function LoginPage() {
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        // Handle admin login
+        if (values.email === ADMIN_EMAIL && values.password === ADMIN_PASSWORD) {
+            const adminProfile: UserProfile = {
+                uid: 'admin_user',
+                email: ADMIN_EMAIL,
+                username: 'Admin',
+                isAdmin: true,
+            };
+            localStorage.setItem('currentUser', JSON.stringify(adminProfile));
+            toast({
+                title: "¡Bienvenido, Admin!",
+            });
+            router.push('/admin');
+            setTimeout(() => window.location.reload(), 500);
+            return;
+        }
+
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         const user = users.find((u: any) => u.email === values.email && u.password === values.password);
 
