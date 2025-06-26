@@ -121,15 +121,15 @@ export default function ItineraryDetailPage() {
                 </div>
 
                 <div className="text-center mb-8 -mt-24 md:-mt-28 relative z-10">
-                     <div className="flex justify-center items-center gap-2 text-foreground">
-                        <h1 className="text-3xl md:text-4xl font-headline font-bold">{tripName}</h1>
-                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-foreground hover:bg-black/10">
+                     <div className="flex justify-center items-center gap-2 text-white">
+                        <h1 className="text-3xl md:text-4xl font-headline font-bold drop-shadow-md">{tripName}</h1>
+                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-black/20">
                             <Edit2 className="h-5 w-5" />
                         </Button>
                     </div>
-                    <p className="text-muted-foreground mt-1">{destination}</p>
-                    <p className="text-muted-foreground">{duration}</p>
-                    <p className="text-muted-foreground">{dates}</p>
+                    <p className="text-foreground mt-1">{destination}</p>
+                    <p className="text-foreground">{duration}</p>
+                    <p className="text-foreground">{dates}</p>
                 </div>
                 
                 <div className="max-w-3xl mx-auto">
