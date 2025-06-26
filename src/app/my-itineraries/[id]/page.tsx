@@ -130,36 +130,46 @@ export default function ItineraryDetailPage() {
 
                     <div className="space-y-6">
                         <h2 className="text-2xl font-headline font-bold text-center mb-4">Itinerario Detallado</h2>
-                        {dailyPlan.map((day, index) => (
-                            <Card key={index} className="bg-primary/10 border-primary/30 shadow-lg overflow-hidden">
-                                <CardHeader className="bg-primary/20 p-4">
-                                    <CardTitle className="text-lg font-headline font-semibold">Día {day.day}: {day.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-4 font-body space-y-4">
-                                    <div>
-                                        <h4 className="font-bold text-base">🗓️ Horario: {day.schedule}</h4>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-base">📍 Actividades</h4>
-                                        <p className="text-muted-foreground mt-1 text-sm">{day.activities}</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-base">🍽️ Sugerencias Gastronómicas</h4>
-                                        <p className="text-muted-foreground mt-1 text-sm">{day.foodSuggestions}</p>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-base">💡 Recomendaciones</h4>
-                                        <p className="text-muted-foreground mt-1 text-sm">{day.companionRecommendations}</p>
-                                    </div>
-                                    {day.events && (
+                        {dailyPlan && dailyPlan.length > 0 ? (
+                            dailyPlan.map((day, index) => (
+                                <Card key={index} className="bg-primary/10 border-primary/30 shadow-lg overflow-hidden">
+                                    <CardHeader className="bg-primary/20 p-4">
+                                        <CardTitle className="text-lg font-headline font-semibold">Día {day.day}: {day.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-4 font-body space-y-4">
                                         <div>
-                                            <h4 className="font-bold text-base">🎉 Eventos Especiales</h4>
-                                            <p className="text-muted-foreground mt-1 text-sm">{day.events}</p>
+                                            <h4 className="font-bold text-base">🗓️ Horario: {day.schedule}</h4>
                                         </div>
-                                    )}
+                                        <div>
+                                            <h4 className="font-bold text-base">📍 Actividades</h4>
+                                            <p className="text-muted-foreground mt-1 text-sm">{day.activities}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-base">🍽️ Sugerencias Gastronómicas</h4>
+                                            <p className="text-muted-foreground mt-1 text-sm">{day.foodSuggestions}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-base">💡 Recomendaciones</h4>
+                                            <p className="text-muted-foreground mt-1 text-sm">{day.companionRecommendations}</p>
+                                        </div>
+                                        {day.events && (
+                                            <div>
+                                                <h4 className="font-bold text-base">🎉 Eventos Especiales</h4>
+                                                <p className="text-muted-foreground mt-1 text-sm">{day.events}</p>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                             <Card className="bg-card border-border shadow-md">
+                                <CardContent className="p-6">
+                                    <p className="text-center text-muted-foreground font-body">
+                                        No hay un plan de itinerario detallado disponible.
+                                    </p>
                                 </CardContent>
                             </Card>
-                        ))}
+                        )}
                     </div>
                 </div>
             </main>
