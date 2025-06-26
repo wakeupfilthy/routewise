@@ -52,25 +52,33 @@ export default function ItineraryDetailPage() {
 
     useEffect(() => {
         const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-            if (id) {
+        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        setUser(parsedUser);
+
+        if (id) {
+            let currentItinerary: SavedItinerary | undefined;
+
+            if (parsedUser) {
                 const userItinerariesKey = `itineraries_${parsedUser.username}`;
                 const savedItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
-                const currentItinerary = savedItineraries.find(it => it.id === id);
-                if (currentItinerary) {
-                    setItinerary(currentItinerary);
-                    setNewTripName(currentItinerary.tripName);
-                    if (!currentItinerary.imageUrl) {
-                        generateAndSaveImage(currentItinerary, parsedUser);
-                    }
-                } else {
-                    router.push('/my-itineraries');
-                }
+                currentItinerary = savedItineraries.find(it => it.id === id);
             }
-        } else {
-            router.push('/login');
+
+            if (!currentItinerary) {
+                const guestItinerariesKey = 'itineraries_guest';
+                const guestItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem(guestItinerariesKey) || '[]');
+                currentItinerary = guestItineraries.find(it => it.id === id);
+            }
+
+            if (currentItinerary) {
+                setItinerary(currentItinerary);
+                setNewTripName(currentItinerary.tripName);
+                if (parsedUser && !currentItinerary.imageUrl) {
+                    generateAndSaveImage(currentItinerary, parsedUser);
+                }
+            } else {
+                router.push('/my-itineraries');
+            }
         }
     }, [id, router, generateAndSaveImage]);
 
@@ -89,7 +97,7 @@ export default function ItineraryDetailPage() {
         setIsRenameDialogOpen(false);
     }
 
-    if (!itinerary || !user) {
+    if (!itinerary) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
@@ -104,7 +112,7 @@ export default function ItineraryDetailPage() {
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <header className="sticky top-0 bg-background/80 backdrop-blur-sm z-20 border-b">
                 <div className="container mx-auto px-4 h-16 flex items-center">
-                    <Button variant="ghost" size="icon" onClick={() => router.push('/my-itineraries')}>
+                    <Button variant="ghost" size="icon" onClick={() => router.back()}>
                         <ArrowLeft className="h-6 w-6" />
                     </Button>
                 </div>
@@ -132,9 +140,11 @@ export default function ItineraryDetailPage() {
                 <div className="text-center mb-8 -mt-24 md:-mt-28 relative z-10">
                      <div className="flex justify-center items-center gap-2 text-white">
                         <h1 className="text-3xl md:text-4xl font-headline font-bold text-white drop-shadow-md">{tripName}</h1>
-                        <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-black/20">
-                            <Edit2 className="h-5 w-5" />
-                        </Button>
+                        {user && (
+                            <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-black/20">
+                                <Edit2 className="h-5 w-5" />
+                            </Button>
+                        )}
                     </div>
                      <div className="text-foreground mt-1">
                         <p>{destination}</p>

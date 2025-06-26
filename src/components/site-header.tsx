@@ -28,8 +28,6 @@ export function SiteHeader() {
   }, []);
   
   useEffect(() => {
-    // This effect listens for route changes to update the user state
-    // It's a fallback for when the storage event doesn't fire (e.g., after programmatic navigation)
     const storedUser = localStorage.getItem('currentUser');
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, [router]);
@@ -53,26 +51,30 @@ export function SiteHeader() {
         
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center">
-             {isClient && user ? (
+            {isClient && (
               <>
                 <Button variant="ghost" asChild>
-                    <Link href="/my-itineraries">Mis Itinerarios</Link>
-                </Button>
-                 <Button variant="ghost" asChild>
                     <Link href="/create-itinerary">Crear Viaje</Link>
                 </Button>
-                <Button onClick={handleLogout}>Cerrar Sesión</Button>
+                {user ? (
+                  <>
+                    <Button variant="ghost" asChild>
+                        <Link href="/my-itineraries">Mis Itinerarios</Link>
+                    </Button>
+                    <Button onClick={handleLogout}>Cerrar Sesión</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" asChild>
+                      <Link href="/login">Iniciar Sesión</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/register">Registrarse</Link>
+                    </Button>
+                  </>
+                )}
               </>
-            ) : isClient ? (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link href="/login">Iniciar Sesión</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/register">Registrarse</Link>
-                </Button>
-              </>
-            ) : null}
+            )}
           </nav>
         </div>
       </div>

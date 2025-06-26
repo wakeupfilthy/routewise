@@ -17,17 +17,10 @@ export default function CreateItineraryPage() {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-    } else {
-      router.push('/login');
     }
-  }, [router]);
+  }, []);
 
   const handleGenerate = async (data: any) => {
-    if (!user) {
-        toast({ title: "Error", description: "Debes iniciar sesión para crear un itinerario.", variant: "destructive" });
-        return;
-    }
-
     setIsLoading(true);
     try {
       const formattedData = {
@@ -47,17 +40,19 @@ export default function CreateItineraryPage() {
         return;
       }
       
-      const userItinerariesKey = `itineraries_${user.username}`;
-      const savedItineraries = JSON.parse(localStorage.getItem(userItinerariesKey) || '[]');
       const newItinerary = {
         id: `trip-${Date.now()}`,
         createdAt: new Date().toISOString(),
         ...result,
       };
+      
+      const storageKey = user ? `itineraries_${user.username}` : 'itineraries_guest';
+      const savedItineraries = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
       savedItineraries.push(newItinerary);
       
       try {
-        localStorage.setItem(userItinerariesKey, JSON.stringify(savedItineraries));
+        localStorage.setItem(storageKey, JSON.stringify(savedItineraries));
       } catch (e) {
         if (e instanceof Error && e.name === 'QuotaExceededError') {
             toast({
@@ -71,7 +66,11 @@ export default function CreateItineraryPage() {
         throw e;
       }
 
-      router.push(`/my-itineraries`);
+      if (user) {
+        router.push(`/my-itineraries`);
+      } else {
+        router.push(`/my-itineraries/${newItinerary.id}`);
+      }
 
     } catch (e) {
       let errorMessage = "No pudimos generar tu itinerario. Por favor, inténtalo de nuevo más tarde.";
@@ -93,14 +92,6 @@ export default function CreateItineraryPage() {
         setIsLoading(false);
     }
   };
-  
-  if (!user) {
-    return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
-        </div>
-    );
-  }
 
   return (
     <div className="container py-8">
