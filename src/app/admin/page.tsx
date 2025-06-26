@@ -81,7 +81,7 @@ export default function AdminPage() {
                         </TableHeader>
                         <TableBody>
                             {users.map((user) => (
-                                <TableRow key={user.uid}>
+                                <TableRow key={user.email}>
                                     <TableCell>{user.username}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell className="text-right">
