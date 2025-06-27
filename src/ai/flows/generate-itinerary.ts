@@ -59,7 +59,6 @@ const prompt = ai.definePrompt({
     name: 'generateItineraryPrompt',
     input: {schema: GenerateItineraryInputSchema},
     output: {schema: GenerateItineraryOutputSchema},
-    model: 'googleai/gemini-2.5-flash-lite-preview-06-17',
     prompt: `Actúa como un planificador de viajes experto. Genera un itinerario personalizado en español, siguiendo estrictamente el formato JSON y el esquema de salida proporcionado.
 
 **Instrucciones Generales:**
