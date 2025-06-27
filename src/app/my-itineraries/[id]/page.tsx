@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import type { SavedItinerary, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ArrowLeft, Edit2 } from 'lucide-react';
+import { ArrowLeft, Edit, Edit2, Save, X } from 'lucide-react';
 import Image from 'next/image';
 import {
     Dialog,
@@ -19,9 +19,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { generateDestinationImage } from '@/ai/flows/generate-destination-image';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function ItineraryDetailPage() {
     const [itinerary, setItinerary] = useState<SavedItinerary | null>(null);
+    const [editableItinerary, setEditableItinerary] = useState<SavedItinerary | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [user, setUser] = useState<UserProfile | null>(null);
     const params = useParams();
     const router = useRouter();
@@ -30,24 +33,20 @@ export default function ItineraryDetailPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTripName, setNewTripName] = useState('');
 
-    // This function now removes the large 'imageUrl' before saving to localStorage to prevent quota errors.
     const updateLocalStorageItinerary = (itineraryToSave: SavedItinerary) => {
         const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
         const index = allItineraries.findIndex(it => it.id === itineraryToSave.id);
         if (index !== -1) {
-            // Exclude the imageUrl from the object being saved to localStorage.
             const { imageUrl, ...restOfItinerary } = itineraryToSave;
             allItineraries[index] = restOfItinerary;
             try {
                 localStorage.setItem('itineraries', JSON.stringify(allItineraries));
             } catch (error) {
                 console.error("Failed to save to localStorage:", error);
-                // Optionally, inform the user that the data could not be saved.
             }
         }
     };
 
-    // This function now only sets the image in the component state and does not save it to localStorage.
     const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
         if (!id || !user) return;
         try {
@@ -55,7 +54,6 @@ export default function ItineraryDetailPage() {
             if (imageUrl) {
                 const updatedItinerary = { ...currentItinerary, imageUrl };
                 setItinerary(updatedItinerary);
-                // The call to updateLocalStorageItinerary has been removed to avoid storing large image data.
             }
         } catch (error) {
             console.error("Failed to generate destination image:", error);
@@ -78,8 +76,8 @@ export default function ItineraryDetailPage() {
 
             if (currentItinerary) {
                 setItinerary(currentItinerary);
+                setEditableItinerary(JSON.parse(JSON.stringify(currentItinerary))); // deep copy
                 setNewTripName(currentItinerary.tripName);
-                // If the itinerary in localStorage doesn't have an image, generate one.
                 if (!currentItinerary.imageUrl) {
                     generateAndSaveImage(currentItinerary);
                 }
@@ -88,19 +86,48 @@ export default function ItineraryDetailPage() {
             }
         }
     }, [id, router, user, generateAndSaveImage]);
+    
+    useEffect(() => {
+        if (itinerary && !isEditing) {
+            setEditableItinerary(JSON.parse(JSON.stringify(itinerary)));
+        }
+    }, [isEditing, itinerary]);
 
     const handleRenameSubmit = async () => {
         if (!itinerary || !newTripName.trim() || !user) return;
         
         const updatedItinerary = { ...itinerary, tripName: newTripName.trim() };
         setItinerary(updatedItinerary);
-        // This will now correctly save the renamed itinerary without the image data.
         updateLocalStorageItinerary(updatedItinerary);
         
         setIsRenameDialogOpen(false);
     }
+    
+    const handleSaveEdits = () => {
+        if (!editableItinerary) return;
+        setItinerary(editableItinerary);
+        updateLocalStorageItinerary(editableItinerary);
+        setIsEditing(false);
+    };
 
-    if (!itinerary) {
+    const handleFieldChange = (field: keyof SavedItinerary, value: string) => {
+        if (editableItinerary) {
+            setEditableItinerary({ ...editableItinerary, [field]: value });
+        }
+    };
+
+    const handleDailyPlanChange = (index: number, field: keyof SavedItinerary['itinerario'][number], value: string) => {
+        if (editableItinerary) {
+            const newDailyPlan = [...editableItinerary.itinerario];
+            const currentDay = newDailyPlan[index];
+            if (currentDay) {
+                (currentDay as any)[field] = value;
+                setEditableItinerary({ ...editableItinerary, itinerario: newDailyPlan });
+            }
+        }
+    };
+
+    if (!itinerary || !editableItinerary) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
@@ -108,7 +135,8 @@ export default function ItineraryDetailPage() {
         );
     }
 
-    const { tripName, destination, duration, dates, resumen, gastos, itinerario: dailyPlan, imageUrl } = itinerary;
+    const { tripName, destination, duration, dates, gastos, imageUrl } = itinerary;
+    const { resumen, itinerario: dailyPlan } = isEditing ? editableItinerary : itinerary;
     const city = destination.split(',')[0];
 
     return (
@@ -141,8 +169,8 @@ export default function ItineraryDetailPage() {
                 </div>
 
                 <div className="text-center mb-8 -mt-24 md:-mt-28 relative z-10">
-                     <div className="flex justify-center items-center gap-2 text-white">
-                        <h1 className="text-3xl md:text-4xl font-headline font-bold text-white drop-shadow-md">{tripName}</h1>
+                     <div className="flex justify-center items-center gap-2 text-white drop-shadow-md">
+                        <h1 className="text-3xl md:text-4xl font-headline font-bold text-white">{tripName}</h1>
                         {user && (
                             <Button variant="ghost" size="icon" onClick={() => setIsRenameDialogOpen(true)} className="text-white hover:bg-black/20">
                                 <Edit2 className="h-5 w-5" />
@@ -163,7 +191,15 @@ export default function ItineraryDetailPage() {
                                 <CardTitle className="text-center text-xl font-headline font-semibold">Tu Experiencia de Viaje</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-center text-muted-foreground font-body">{resumen}</p>
+                                {isEditing ? (
+                                    <Textarea
+                                        value={editableItinerary.resumen}
+                                        onChange={(e) => handleFieldChange('resumen', e.target.value)}
+                                        className="w-full min-h-[100px] text-sm"
+                                    />
+                                ) : (
+                                    <p className="text-center text-muted-foreground font-body">{resumen}</p>
+                                )}
                             </CardContent>
                         </Card>
                     )}
@@ -219,20 +255,52 @@ export default function ItineraryDetailPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-base">📍 Actividades</h4>
-                                            <p className="text-muted-foreground mt-1 text-sm">{day.activities}</p>
+                                            {isEditing ? (
+                                                <Textarea
+                                                    value={editableItinerary.itinerario[index].activities}
+                                                    onChange={(e) => handleDailyPlanChange(index, 'activities', e.target.value)}
+                                                    className="mt-1 text-sm w-full"
+                                                />
+                                            ) : (
+                                                <p className="text-muted-foreground mt-1 text-sm">{day.activities}</p>
+                                            )}
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-base">🍽️ Sugerencias Gastronómicas</h4>
-                                            <p className="text-muted-foreground mt-1 text-sm">{day.foodSuggestions}</p>
+                                            {isEditing ? (
+                                                <Textarea
+                                                    value={editableItinerary.itinerario[index].foodSuggestions}
+                                                    onChange={(e) => handleDailyPlanChange(index, 'foodSuggestions', e.target.value)}
+                                                    className="mt-1 text-sm w-full"
+                                                />
+                                            ) : (
+                                                <p className="text-muted-foreground mt-1 text-sm">{day.foodSuggestions}</p>
+                                            )}
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-base">💡 Recomendaciones</h4>
-                                            <p className="text-muted-foreground mt-1 text-sm">{day.companionRecommendations}</p>
+                                            {isEditing ? (
+                                                <Textarea
+                                                    value={editableItinerary.itinerario[index].companionRecommendations}
+                                                    onChange={(e) => handleDailyPlanChange(index, 'companionRecommendations', e.target.value)}
+                                                    className="mt-1 text-sm w-full"
+                                                />
+                                            ) : (
+                                                <p className="text-muted-foreground mt-1 text-sm">{day.companionRecommendations}</p>
+                                            )}
                                         </div>
                                         {day.events && (
                                             <div>
                                                 <h4 className="font-bold text-base">🎉 Eventos Especiales</h4>
-                                                <p className="text-muted-foreground mt-1 text-sm">{day.events}</p>
+                                                {isEditing ? (
+                                                    <Textarea
+                                                        value={editableItinerary.itinerario[index].events || ''}
+                                                        onChange={(e) => handleDailyPlanChange(index, 'events', e.target.value)}
+                                                        className="mt-1 text-sm w-full"
+                                                    />
+                                                ) : (
+                                                    <p className="text-muted-foreground mt-1 text-sm">{day.events}</p>
+                                                )}
                                             </div>
                                         )}
                                     </CardContent>
@@ -246,6 +314,25 @@ export default function ItineraryDetailPage() {
                                     </p>
                                 </CardContent>
                             </Card>
+                        )}
+                    </div>
+                    <div className="mt-8 flex justify-end gap-2">
+                        {isEditing ? (
+                            <>
+                                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                                    <X className="mr-2 h-4 w-4" />
+                                    Cancelar
+                                </Button>
+                                <Button onClick={handleSaveEdits}>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Guardar Cambios
+                                </Button>
+                            </>
+                        ) : (
+                            <Button onClick={() => setIsEditing(true)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar Itinerario
+                            </Button>
                         )}
                     </div>
                 </div>
