@@ -13,7 +13,7 @@ export const preferenciasItems = [
     { id: 'vidaNocturna', label: 'Vida nocturna' },
     { id: 'compras', label: 'Compras' },
 ];
-
+ 
 export const presupuestos = [
   "Muy bajo (<400 USD)",
   "Bajo (400-700 USD)",
