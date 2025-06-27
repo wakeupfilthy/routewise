@@ -1,4 +1,4 @@
-'use server';
+'use server'; 
 /**
  * @fileOverview Generates an image for a travel destination.
  *
