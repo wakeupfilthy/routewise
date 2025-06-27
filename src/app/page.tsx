@@ -1,14 +1,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
 import { Plane, PenSquare, Compass } from 'lucide-react';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="container grid lg:grid-cols-2 gap-12 items-center py-16 md:py-24">
-        <div className="space-y-6">
+      <section className="container flex flex-col items-center text-center gap-12 py-16 md:py-24">
+        <div className="space-y-6 max-w-2xl">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-gray-800">
             Tu viaje soñado, a un clic de distancia.
           </h1>
@@ -18,16 +17,6 @@ export default function Home() {
           <Button size="lg" asChild className="text-lg py-6 px-8">
             <Link href="/register">Comenzar ahora</Link>
           </Button>
-        </div>
-        <div className="relative h-80 lg:h-[450px] rounded-lg overflow-hidden shadow-2xl group">
-           <Image 
-                src="https://placehold.co/600x400.png"
-                alt="Collage de imágenes de viajes mostrando un mapa, una maleta y un pasaporte"
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                data-ai-hint="travel collage"
-            />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
         </div>
       </section>
       
