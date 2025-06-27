@@ -30,23 +30,32 @@ export default function ItineraryDetailPage() {
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [newTripName, setNewTripName] = useState('');
 
-    const updateLocalStorageItinerary = (updatedItinerary: SavedItinerary) => {
+    // This function now removes the large 'imageUrl' before saving to localStorage to prevent quota errors.
+    const updateLocalStorageItinerary = (itineraryToSave: SavedItinerary) => {
         const allItineraries: SavedItinerary[] = JSON.parse(localStorage.getItem('itineraries') || '[]');
-        const index = allItineraries.findIndex(it => it.id === updatedItinerary.id);
+        const index = allItineraries.findIndex(it => it.id === itineraryToSave.id);
         if (index !== -1) {
-            allItineraries[index] = updatedItinerary;
-            localStorage.setItem('itineraries', JSON.stringify(allItineraries));
+            // Exclude the imageUrl from the object being saved to localStorage.
+            const { imageUrl, ...restOfItinerary } = itineraryToSave;
+            allItineraries[index] = restOfItinerary;
+            try {
+                localStorage.setItem('itineraries', JSON.stringify(allItineraries));
+            } catch (error) {
+                console.error("Failed to save to localStorage:", error);
+                // Optionally, inform the user that the data could not be saved.
+            }
         }
     };
 
-     const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
+    // This function now only sets the image in the component state and does not save it to localStorage.
+    const generateAndSaveImage = useCallback(async (currentItinerary: SavedItinerary) => {
         if (!id || !user) return;
         try {
             const { imageUrl } = await generateDestinationImage({ destination: currentItinerary.destination });
             if (imageUrl) {
                 const updatedItinerary = { ...currentItinerary, imageUrl };
                 setItinerary(updatedItinerary);
-                updateLocalStorageItinerary(updatedItinerary);
+                // The call to updateLocalStorageItinerary has been removed to avoid storing large image data.
             }
         } catch (error) {
             console.error("Failed to generate destination image:", error);
@@ -70,6 +79,7 @@ export default function ItineraryDetailPage() {
             if (currentItinerary) {
                 setItinerary(currentItinerary);
                 setNewTripName(currentItinerary.tripName);
+                // If the itinerary in localStorage doesn't have an image, generate one.
                 if (!currentItinerary.imageUrl) {
                     generateAndSaveImage(currentItinerary);
                 }
@@ -84,6 +94,7 @@ export default function ItineraryDetailPage() {
         
         const updatedItinerary = { ...itinerary, tripName: newTripName.trim() };
         setItinerary(updatedItinerary);
+        // This will now correctly save the renamed itinerary without the image data.
         updateLocalStorageItinerary(updatedItinerary);
         
         setIsRenameDialogOpen(false);
